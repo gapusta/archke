@@ -3,11 +3,12 @@ package edu.myrza.archke.server.consumer
 class Printer : MessageConsumer {
 
     override fun consume(payload: ByteArray): ByteArray {
-        // decode input
+        // 1. decode input
         val message = String(payload, Charsets.UTF_8)
-        // process
+        // 2. process
         println(message)
-        // encode output
+        // 3. encode output (in this case, we do not need to)
+        // 4. return output
         return ByteArray(0)
     }
 

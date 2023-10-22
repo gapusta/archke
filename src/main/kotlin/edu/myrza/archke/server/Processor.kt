@@ -1,5 +1,6 @@
 package edu.myrza.archke.server
 
+import edu.myrza.archke.util.toPositiveInt
 import java.nio.ByteBuffer
 import java.nio.channels.SelectionKey
 import java.nio.channels.Selector
@@ -11,83 +12,83 @@ class Processor(
     private val socketChannel: SocketChannel
 ) : Runnable {
 
-    private var state = State.READING_HEADER
+    private var state = State.READING
 
-    private val inputHeader = ByteBuffer.allocate(3)
-    private var command: Byte = 0
-    private var length: Short = 0
-    private val input = ByteBuffer.allocate(65534) // 64 kb
+    private var command = 0
+    private var length = 0
 
-    private val outputHeader = ByteBuffer.allocate(3)
-    private val output = ByteBuffer.allocate(65534) // 64 kb
+    private val input = ByteBuffer.allocate(BUFFER_MAX_SIZE) // 2 mb
+    private val output = ByteBuffer.allocate(BUFFER_MAX_SIZE) // 2 mb
 
     override fun run() {
         when (state) {
-            State.READING_HEADER,
-            State.READING_PAYLOAD -> read()
+            State.READING -> read()
             State.WRITING -> write()
         }
     }
 
     private fun read() {
-        if (state == State.READING_HEADER) {
-            socketChannel.read(inputHeader)
-            if (inputHeader.position() == HEADER_SIZE) {
-                // header is completely read
-                inputHeader.flip()
-                command = inputHeader.get()
-                length = inputHeader.getShort()
-                state = State.READING_PAYLOAD
-            }
+        socketChannel.read(input)
+
+        if (input.position() == HEADER_SIZE) {
+            // header is completely read
+            command = input.toPositiveInt(0)
+            length = input.toPositiveInt(4)
+            input.mark()
+            return
         }
-        else if (state == State.READING_PAYLOAD) {
-            socketChannel.read(input)
-            if (input.position() == length.toInt()) {
-                // payload is read completely
-                input.flip()
 
-                process()
+        if (input.position() == length + HEADER_SIZE) {
+            // payload is completely read
+            process()
 
-                // clean up
-                inputHeader.clear()
-                input.clear()
+            input.clear()
 
-                // event registration
-                selectionKey.cancel() // cancel listening to read event
-                selectionKey = socketChannel.register(selector, SelectionKey.OP_WRITE) // register listening to writing event
-                state = State.WRITING
-            }
+            // write event registration
+            selectionKey.cancel() // cancel listening to read event
+            selectionKey = socketChannel.register(selector, SelectionKey.OP_WRITE) // register listening to writing event
+            state = State.WRITING
         }
     }
 
     private fun process() {
-        // TODO : process
+        // process
+        val message = String(input.array(), HEADER_SIZE, HEADER_SIZE + length, Charsets.UTF_8)
 
-        // TODO : prepare output
+        // prepare output
+        output.putInt(OK_RESPONSE_CODE)
+        output.putInt(EMPTY_PAYLOAD_LENGTH)
 
         // flip output so write could write its data into channel
         output.flip()
     }
 
     private fun write() {
-        if (outputHeader.hasRemaining() || output.hasRemaining()) {
-            socketChannel.write(arrayOf(outputHeader, output))
-        } else {
-            outputHeader.clear()
-            state = State.READING_HEADER
+        socketChannel.write(output)
+        if (!output.hasRemaining()) {
+            // output is written completely
+            output.clear()
 
-            selectionKey.cancel()
-            selectionKey = socketChannel.register(selector, SelectionKey.OP_READ)
+            selectionKey.cancel() // unregister writing
+            selectionKey = socketChannel.register(selector, SelectionKey.OP_READ) // register reading
+
+            state = State.READING
         }
     }
 
     private enum class State {
-         READING_HEADER, READING_PAYLOAD, WRITING
+         READING, WRITING
     }
 
     companion object {
 
-        const val HEADER_SIZE = 3
+        // 4 bytes - command
+        // 4 bytes - payload length
+        private const val HEADER_SIZE = 8
+        private const val BUFFER_MAX_SIZE = 2097152
+
+        private const val OK_RESPONSE_CODE = 1
+        private const val EMPTY_PAYLOAD_LENGTH = 0
 
         fun create(socketChannel: SocketChannel, selector: Selector): Processor {
             socketChannel.configureBlocking(false)

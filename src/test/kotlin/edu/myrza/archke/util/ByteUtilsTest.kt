@@ -10,7 +10,7 @@ class ByteUtilsTest {
     fun testConvert() {
         val buffer = ByteBuffer.allocate(4).apply { this.putInt(69) }
 
-        val result = buffer.toPositiveInt(0)
+        val result = buffer.getPositiveInt(0)
 
         assertEquals(69, result)
     }
@@ -19,7 +19,7 @@ class ByteUtilsTest {
     fun testConvertMinValue() {
         val buffer = ByteBuffer.allocate(4).apply { this.putInt(0) }
 
-        val result = buffer.toPositiveInt(0)
+        val result = buffer.getPositiveInt(0)
 
         assertEquals(0, result)
     }
@@ -28,7 +28,7 @@ class ByteUtilsTest {
     fun testConvertMaxValue() {
         val buffer = ByteBuffer.allocate(4).apply { this.putInt(2097152) }
 
-        val result = buffer.toPositiveInt(0)
+        val result = buffer.getPositiveInt(0)
 
         assertEquals(2097152, result)
     }
@@ -40,7 +40,7 @@ class ByteUtilsTest {
             this.putInt(3142)
         }
 
-        val result = buffer.toPositiveInt(1)
+        val result = buffer.getPositiveInt(1)
 
         assertEquals(3142, result)
     }
@@ -52,7 +52,7 @@ class ByteUtilsTest {
             this.putInt(0)
         }
 
-        val result = buffer.toPositiveInt(1)
+        val result = buffer.getPositiveInt(1)
 
         assertEquals(0, result)
     }
@@ -64,7 +64,7 @@ class ByteUtilsTest {
             this.putInt(2097152)
         }
 
-        val result = buffer.toPositiveInt(1)
+        val result = buffer.getPositiveInt(1)
 
         assertEquals(2097152, result)
     }

@@ -1,5 +1,6 @@
 package edu.myrza.archke.server
 
+import edu.myrza.archke.server.consumer.MessageConsumer
 import java.net.InetSocketAddress
 import java.nio.channels.SelectionKey
 import java.nio.channels.Selector
@@ -8,8 +9,9 @@ import java.nio.channels.SocketChannel
 
 class Reactor(
     private val selector: Selector,
-    private val serverSocketChannel: ServerSocketChannel
-): Runnable {
+    private val serverSocketChannel: ServerSocketChannel,
+    private val consumer: MessageConsumer
+) : Runnable {
 
     private val processors = mutableMapOf<SocketChannel, Runnable>()
 
@@ -21,9 +23,7 @@ class Reactor(
 
             for(key in selected) {
                 if (key.isAcceptable) {
-                    serverSocketChannel.accept().also {
-                        processors[it] = Processor.create(it, selector)
-                    }
+                    serverSocketChannel.accept().also { processors[it] = Processor.create(it, selector, consumer) }
                 } else {
                     processors[key.channel()]!!.run()
                 }
@@ -35,15 +35,15 @@ class Reactor(
 
     companion object {
 
-        fun create(port: Int): Reactor {
+        fun create(port: Int, consumer: MessageConsumer): Reactor {
             val selector = Selector.open()
-            val serverSocketChannel = ServerSocketChannel.open().apply {
+            val serverChannel = ServerSocketChannel.open().apply {
                 this.socket().bind(InetSocketAddress(port))
                 this.configureBlocking(false)
                 this.register(selector, SelectionKey.OP_ACCEPT)
             }
 
-            return Reactor(selector, serverSocketChannel)
+            return Reactor(selector, serverChannel, consumer)
         }
 
     }

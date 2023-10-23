@@ -8,7 +8,7 @@ import java.nio.channels.SelectionKey
 import java.nio.channels.Selector
 import java.nio.channels.SocketChannel
 
-class Processor(
+class Processor private constructor (
     private val selector: Selector,
     private var selectionKey: SelectionKey,
     private val socketChannel: SocketChannel,

@@ -7,7 +7,7 @@ import java.nio.channels.Selector
 import java.nio.channels.ServerSocketChannel
 import java.nio.channels.SocketChannel
 
-class Reactor(
+class Reactor private constructor (
     private val selector: Selector,
     private val serverSocketChannel: ServerSocketChannel,
     private val consumer: MessageConsumer

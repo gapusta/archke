@@ -8,3 +8,4 @@
 - https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax#lists
 - https://www.baeldung.com/kotlin/try-with-resources
 - https://kotlinlang.org/docs/visibility-modifiers.html
+- https://docs.oracle.com/javase/8/docs/technotes/guides/net/articles/connection_release.html

@@ -34,7 +34,13 @@ class Processor private constructor (
     }
 
     private fun read() {
-        socketChannel.read(input) // scattering read
+        val read = socketChannel.read(input) // scattering read
+
+        if (read == -1L) { // client signaled connection close
+            socketChannel.close()
+            println("Connection closed")
+            return
+        }
 
         if (state == READING_HEADER && !inputHeader.hasRemaining()) {
             // header is completely read

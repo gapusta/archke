@@ -11,7 +11,7 @@ interface Session: Closeable {
     companion object {
 
         // TODO : do we need a builder here (builder that takes configurations as parameters)?
-        fun open(host: String, port: Int): Session { return SessionImpl() }
+        fun open(host: String, port: Int): Session { return SessionImpl(host, port) }
 
     }
 

@@ -23,9 +23,9 @@ class Reactor private constructor (
 
             for(key in selected) {
                 if (key.isAcceptable) {
-                    println("Accept event")
+                    println("INFO : Accept event")
                     serverSocketChannel.accept().also { processors[it] = Processor.create(it, selector, consumer) }
-                    println("New processor created")
+                    println("INFO : New processor created")
                 } else {
                     val channel = key.channel()
                     processors[channel]!!.run()

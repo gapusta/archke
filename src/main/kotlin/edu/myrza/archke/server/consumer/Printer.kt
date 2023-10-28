@@ -6,7 +6,7 @@ class Printer : MessageConsumer {
         // 1. decode input
         val message = String(payload, Charsets.UTF_8)
         // 2. process
-        println(message)
+        println("MESSAGE : $message")
         // 3. encode output (in this case, we do not need to)
         // 4. return output
         return ByteArray(0)

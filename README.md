@@ -9,3 +9,4 @@
 - https://www.baeldung.com/kotlin/try-with-resources
 - https://kotlinlang.org/docs/visibility-modifiers.html
 - https://docs.oracle.com/javase/8/docs/technotes/guides/net/articles/connection_release.html
+- https://itecnote.com/tecnote/java-why-is-it-impossible-without-attempting-i-o-to-detect-that-tcp-socket-was-gracefully-closed-by-peer/

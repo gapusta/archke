@@ -9,7 +9,6 @@ import java.nio.channels.Selector
 import java.nio.channels.SocketChannel
 
 class Processor private constructor (
-    private val selector: Selector,
     private var selectionKey: SelectionKey,
     private val socketChannel: SocketChannel,
     private val consumer: MessageConsumer
@@ -20,11 +19,8 @@ class Processor private constructor (
     private var command = 0
     private var length = 0
 
-    private val inputHeader = ByteBuffer.allocate(HEADER_SIZE)
-    private val inputPayload = ByteBuffer.allocate(PAYLOAD_MAX_SIZE)
-    private val input = arrayOf(inputHeader, inputPayload)
-
-    private val outputHeader = ByteBuffer.allocate(HEADER_SIZE)
+    private var input = ByteBuffer.allocate(HEADER_SIZE)
+    private val output = ByteBuffer.allocate(HEADER_SIZE)
 
     override fun run() {
         when (state) {
@@ -36,29 +32,28 @@ class Processor private constructor (
     private fun read() {
         val read = socketChannel.read(input) // scattering read
 
-        if (read == -1L) { // client signaled connection close
+        if (read == -1) { // client signaled connection close
             socketChannel.close()
-            println("Connection closed")
+            println("INFO : Connection closed")
             return
         }
 
-        if (state == READING_HEADER && !inputHeader.hasRemaining()) {
+        if (state == READING_HEADER && !input.hasRemaining()) {
             // header is completely read
-            command = inputHeader.getPositiveInt(0)
-            length = inputHeader.getPositiveInt(4)
+            command = input.getPositiveInt(0)
+            length = input.getPositiveInt(4)
+            input = ByteBuffer.allocate(length)
             state = READING_PAYLOAD
         }
 
-        if (state == READING_PAYLOAD && inputPayload.position() == length) {
+        if (state == READING_PAYLOAD && !input.hasRemaining()) {
             // payload is completely read
             process()
 
-            inputHeader.clear()
-            inputPayload.clear()
+            input = ByteBuffer.allocate(HEADER_SIZE)
 
             // write event registration
-            selectionKey.cancel() // cancel read event listening
-            selectionKey = socketChannel.register(selector, SelectionKey.OP_WRITE) // register writing event listening
+            selectionKey.interestOps(SelectionKey.OP_WRITE) // register writing event listening
             state = WRITING_HEADER
         }
     }
@@ -67,26 +62,24 @@ class Processor private constructor (
         if (length <= 0) return
 
         // process
-        consumer.consume(inputPayload.array())
+        consumer.consume(input.array())
 
         // prepare output
-        outputHeader.putInt(OK_RESPONSE_CODE)
-        outputHeader.putInt(EMPTY_PAYLOAD_LENGTH)
+        output.putInt(OK_RESPONSE_CODE)
+        output.putInt(EMPTY_PAYLOAD_LENGTH)
 
         // flip output so write could write its data into channel
-        outputHeader.flip()
+        output.flip()
     }
 
     private fun write() {
-        socketChannel.write(outputHeader)
+        socketChannel.write(output)
 
-        if (state == WRITING_HEADER && !outputHeader.hasRemaining()) {
+        if (state == WRITING_HEADER && !output.hasRemaining()) {
             // output is written completely
-            outputHeader.clear()
+            output.clear()
 
-            selectionKey.cancel() // unregister writing
-            selectionKey = socketChannel.register(selector, SelectionKey.OP_READ) // register reading
-
+            selectionKey.interestOps(SelectionKey.OP_READ) // register reading event listening
             state = READING_HEADER
         }
     }
@@ -98,7 +91,6 @@ class Processor private constructor (
         // 4 bytes - command
         // 4 bytes - payload length
         private const val HEADER_SIZE = 8
-        private const val PAYLOAD_MAX_SIZE = 2097152 // 2mb
 
         private const val OK_RESPONSE_CODE = 1
         private const val EMPTY_PAYLOAD_LENGTH = 0
@@ -106,7 +98,7 @@ class Processor private constructor (
         fun create(channel: SocketChannel, selector: Selector, consumer: MessageConsumer): Processor {
             channel.configureBlocking(false)
             val key = channel.register(selector, SelectionKey.OP_READ)
-            return Processor(selector, key, channel, consumer)
+            return Processor(key, channel, consumer)
         }
 
     }

@@ -1,7 +1,9 @@
 package edu.myrza.archke.server
 
+import edu.myrza.archke.client.Command
 import edu.myrza.archke.server.Processor.State.*
 import edu.myrza.archke.server.consumer.MessageConsumer
+import edu.myrza.archke.util.getBytes
 import edu.myrza.archke.util.getPositiveInt
 import java.nio.ByteBuffer
 import java.nio.channels.SelectionKey
@@ -20,7 +22,9 @@ class Processor private constructor (
     private var length = 0
 
     private var input = ByteBuffer.allocate(HEADER_SIZE)
-    private val output = ByteBuffer.allocate(HEADER_SIZE)
+    private var output = ByteBuffer.allocate(HEADER_SIZE)
+
+    private var outputPayload = ByteArray(0)
 
     override fun run() {
         when (state) {
@@ -49,37 +53,41 @@ class Processor private constructor (
         if (state == READING_PAYLOAD && !input.hasRemaining()) {
             // payload is completely read
             process()
-
+            command = 0
+            length = 0
             input = ByteBuffer.allocate(HEADER_SIZE)
-
-            // write event registration
-            selectionKey.interestOps(SelectionKey.OP_WRITE) // register writing event listening
-            state = WRITING_HEADER
         }
     }
 
     private fun process() {
-        if (length <= 0) return
+        if (command == Command.PROCESS.code) outputPayload = consumer.consume(input.array())
 
-        // process
-        consumer.consume(input.array())
-
-        // prepare output
-        output.putInt(OK_RESPONSE_CODE)
-        output.putInt(EMPTY_PAYLOAD_LENGTH)
-
+        // prepare output header
+        output.put(Response.OK.code.getBytes())
+        output.put(outputPayload.size.getBytes())
         // flip output so write could write its data into channel
         output.flip()
+
+        // write event registration
+        selectionKey.interestOps(SelectionKey.OP_WRITE) // register writing event listening
+        state = WRITING_HEADER
     }
 
     private fun write() {
         socketChannel.write(output)
 
         if (state == WRITING_HEADER && !output.hasRemaining()) {
-            // output is written completely
-            output.clear()
+            // output header is written completely
+            output = ByteBuffer.wrap(outputPayload)
+            state = WRITING_PAYLOAD
+        }
 
-            selectionKey.interestOps(SelectionKey.OP_READ) // register reading event listening
+        if (state == WRITING_PAYLOAD && !output.hasRemaining()) {
+            // output payload is written completely
+            output = ByteBuffer.allocate(HEADER_SIZE)
+
+            // register reading event listening
+            selectionKey.interestOps(SelectionKey.OP_READ)
             state = READING_HEADER
         }
     }
@@ -91,9 +99,6 @@ class Processor private constructor (
         // 4 bytes - command
         // 4 bytes - payload length
         private const val HEADER_SIZE = 8
-
-        private const val OK_RESPONSE_CODE = 1
-        private const val EMPTY_PAYLOAD_LENGTH = 0
 
         fun create(channel: SocketChannel, selector: Selector, consumer: MessageConsumer): Processor {
             channel.configureBlocking(false)

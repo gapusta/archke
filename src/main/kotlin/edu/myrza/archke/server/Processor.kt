@@ -11,8 +11,8 @@ import java.nio.channels.Selector
 import java.nio.channels.SocketChannel
 
 class Processor private constructor (
-    private var selectionKey: SelectionKey,
-    private val socketChannel: SocketChannel,
+    private var key: SelectionKey,
+    private val channel: SocketChannel,
     private val consumer: MessageConsumer
 ) : Runnable {
 
@@ -34,10 +34,10 @@ class Processor private constructor (
     }
 
     private fun read() {
-        val read = socketChannel.read(input) // scattering read
+        val read = channel.read(input) // scattering read
 
         if (read == -1) { // client signaled connection close
-            socketChannel.close()
+            channel.close()
             println("INFO : Connection closed")
             return
         }
@@ -69,12 +69,12 @@ class Processor private constructor (
         output.flip()
 
         // write event registration
-        selectionKey.interestOps(SelectionKey.OP_WRITE) // register writing event listening
+        key.interestOps(SelectionKey.OP_WRITE) // register writing event listening
         state = WRITING_HEADER
     }
 
     private fun write() {
-        socketChannel.write(output)
+        channel.write(output)
 
         if (state == WRITING_HEADER && !output.hasRemaining()) {
             // output header is written completely
@@ -87,7 +87,7 @@ class Processor private constructor (
             output = ByteBuffer.allocate(HEADER_SIZE)
 
             // register reading event listening
-            selectionKey.interestOps(SelectionKey.OP_READ)
+            key.interestOps(SelectionKey.OP_READ)
             state = READING_HEADER
         }
     }

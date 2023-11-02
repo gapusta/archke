@@ -5,35 +5,28 @@ import java.net.InetSocketAddress
 import java.nio.channels.SelectionKey
 import java.nio.channels.Selector
 import java.nio.channels.ServerSocketChannel
-import java.nio.channels.SocketChannel
+import java.nio.channels.spi.AbstractSelectableChannel
 
 class Reactor private constructor (
     private val selector: Selector,
-    private val serverSocketChannel: ServerSocketChannel,
-    private val consumer: MessageConsumer
+    private val processors: MutableMap<AbstractSelectableChannel, Runnable>,
 ) : Runnable {
 
-    private val processors = mutableMapOf<SocketChannel, Runnable>()
-
     override fun run() {
+        // Event loop
         while (!Thread.interrupted()) {
             selector.select()
 
             val selected = selector.selectedKeys()
 
             for(key in selected) {
-                if (key.isAcceptable) {
-                    println("INFO : Accept event")
-                    serverSocketChannel.accept().also { processors[it] = Processor.create(it, selector, consumer) }
-                    println("INFO : New processor created")
-                } else {
-                    val channel = key.channel()
-                    processors[channel]!!.run()
-                    if (!key.isValid) {
-                        // key could become cancelled during processor execution, so we should check for it
-                        processors.remove(channel)
-                    }
-                }
+                val channel = key.channel()
+
+                processors[channel]!!.run()
+
+                // keys can get cancelled during processor execution,
+                // so we should remove processors of these keys
+                if (!key.isValid) processors.remove(channel)
             }
 
             selected.clear()
@@ -41,7 +34,6 @@ class Reactor private constructor (
     }
 
     companion object {
-
         fun create(port: Int, consumer: MessageConsumer): Reactor {
             val selector = Selector.open()
             val serverChannel = ServerSocketChannel.open().apply {
@@ -49,10 +41,11 @@ class Reactor private constructor (
                 this.configureBlocking(false)
                 this.register(selector, SelectionKey.OP_ACCEPT)
             }
+            val processors = mutableMapOf<AbstractSelectableChannel, Runnable>()
 
-            return Reactor(selector, serverChannel, consumer)
+            processors[serverChannel] = Acceptor.create(selector, serverChannel, processors, consumer)
+
+            return Reactor(selector, processors)
         }
-
     }
-
 }

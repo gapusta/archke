@@ -3,6 +3,7 @@ package edu.myrza.archke.server
 import edu.myrza.archke.client.Command
 import edu.myrza.archke.server.Processor.State.*
 import edu.myrza.archke.server.consumer.MessageConsumer
+import edu.myrza.archke.server.consumer.Printer
 import edu.myrza.archke.util.getBytes
 import edu.myrza.archke.util.getPositiveInt
 import java.nio.ByteBuffer
@@ -100,10 +101,11 @@ class Processor private constructor (
         // 4 bytes - payload length
         private const val HEADER_SIZE = 8
 
-        fun create(channel: SocketChannel, selector: Selector, consumer: MessageConsumer): Processor {
+        fun create(channel: SocketChannel, selector: Selector): Processor {
             channel.configureBlocking(false)
             val key = channel.register(selector, SelectionKey.OP_READ)
-            return Processor(key, channel, consumer)
+            val messageConsumer = Printer()
+            return Processor(key, channel, messageConsumer)
         }
 
     }

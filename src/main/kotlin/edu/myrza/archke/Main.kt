@@ -2,11 +2,10 @@ package edu.myrza.archke
 
 import edu.myrza.archke.client.Session
 import edu.myrza.archke.server.Reactor
-import edu.myrza.archke.server.consumer.Printer
 
 fun main(args: Array<String>) {
     // server example
-    val reactor = Reactor.create(9999, Printer())
+    val reactor = Reactor.create(9999)
     val thread = Thread(reactor)
     thread.start()
 

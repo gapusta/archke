@@ -35,7 +35,7 @@ class Processor private constructor (
     }
 
     private fun read() {
-        val read = channel.read(input) // scattering read
+        val read = channel.read(input)
 
         if (read == -1) { // client signaled connection close
             channel.close()

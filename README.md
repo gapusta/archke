@@ -11,3 +11,5 @@
 - https://docs.oracle.com/javase/8/docs/technotes/guides/net/articles/connection_release.html
 - https://itecnote.com/tecnote/java-why-is-it-impossible-without-attempting-i-o-to-detect-that-tcp-socket-was-gracefully-closed-by-peer/
 - https://www.youtube.com/watch?v=JFch3ctY6nE&list=LL&index=4&t=1209s
+- https://tldp.org/HOWTO/TCP-Keepalive-HOWTO/usingkeepalive.html
+- https://stackoverflow.com/questions/5435098/how-to-use-so-keepalive-option-properly-to-detect-that-the-client-at-the-other-e

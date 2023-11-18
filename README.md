@@ -13,3 +13,4 @@
 - https://www.youtube.com/watch?v=JFch3ctY6nE&list=LL&index=4&t=1209s
 - https://tldp.org/HOWTO/TCP-Keepalive-HOWTO/usingkeepalive.html
 - https://stackoverflow.com/questions/5435098/how-to-use-so-keepalive-option-properly-to-detect-that-the-client-at-the-other-e
+- https://www.scottklement.com/rpg/socktimeout/errorHandling.html

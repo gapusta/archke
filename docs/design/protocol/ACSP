@@ -33,6 +33,6 @@ SET command
 
     Example of SET command, encoded:
 
-	^23\r\n*3\r\n$3\r\nSET\r\n$5\r\nMYKEY$6\r\nMYVALUE
+	^20\r\n*3\r\n+SET\r\n$5\r\nMYKEY$6\r\nMYVALUE
 
     This command creates a key-value pair "MYKEY"->"MYVALUE"

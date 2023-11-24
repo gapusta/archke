@@ -1,8 +1,8 @@
-package edu.myrza.archke.server.consumer
+package edu.myrza.archke.server.controller
 
-class Printer : MessageConsumer {
+class DefaultController : Controller {
 
-    override fun consume(payload: ByteArray): ByteArray {
+    override fun handle(payload: ByteArray): ByteArray {
         if (payload.isNotEmpty()) {
             // 1. decode input
             val message = String(payload, Charsets.UTF_8)

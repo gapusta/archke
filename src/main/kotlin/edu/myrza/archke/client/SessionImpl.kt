@@ -1,6 +1,6 @@
 package edu.myrza.archke.client
 
-import edu.myrza.archke.server.Response
+import edu.myrza.archke.server.io.Response
 import edu.myrza.archke.util.getBytes
 import edu.myrza.archke.util.getPositiveInt
 import java.net.Socket

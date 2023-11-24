@@ -1,6 +1,6 @@
 package edu.myrza.archke
 
-import edu.myrza.archke.server.Reactor
+import edu.myrza.archke.server.io.Reactor
 
 fun main(args: Array<String>) {
     val reactor = Reactor.create(9999)

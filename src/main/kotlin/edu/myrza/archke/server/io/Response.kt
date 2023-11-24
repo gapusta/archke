@@ -1,4 +1,4 @@
-package edu.myrza.archke.server
+package edu.myrza.archke.server.io
 
 enum class Response(val code: Int) {
     OK(1), ERROR(2);

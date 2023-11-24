@@ -1,9 +1,9 @@
-package edu.myrza.archke.server
+package edu.myrza.archke.server.io
 
 import edu.myrza.archke.client.Command
-import edu.myrza.archke.server.Processor.State.*
-import edu.myrza.archke.server.consumer.MessageConsumer
-import edu.myrza.archke.server.consumer.Printer
+import edu.myrza.archke.server.io.Processor.State.*
+import edu.myrza.archke.server.controller.Controller
+import edu.myrza.archke.server.controller.DefaultController
 import edu.myrza.archke.util.getBytes
 import edu.myrza.archke.util.getPositiveInt
 import java.nio.ByteBuffer
@@ -14,7 +14,7 @@ import java.nio.channels.SocketChannel
 class Processor private constructor (
     private var key: SelectionKey,
     private val channel: SocketChannel,
-    private val consumer: MessageConsumer
+    private val controller: Controller
 ) : Runnable {
 
     private var state = READING_HEADER
@@ -61,7 +61,7 @@ class Processor private constructor (
     }
 
     private fun process() {
-        if (command == Command.PROCESS.code) outputPayload = consumer.consume(input.array())
+        if (command == Command.PROCESS.code) outputPayload = controller.handle(input.array())
 
         // prepare output header
         output.put(Response.OK.code.getBytes())
@@ -104,7 +104,7 @@ class Processor private constructor (
         fun create(channel: SocketChannel, selector: Selector): Processor {
             channel.configureBlocking(false)
             val key = channel.register(selector, SelectionKey.OP_READ)
-            val messageConsumer = Printer()
+            val messageConsumer = DefaultController()
             return Processor(key, channel, messageConsumer)
         }
 

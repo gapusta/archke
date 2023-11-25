@@ -2,7 +2,7 @@
 
 Simple string
 
-    Pattern: +<ascii-encoded-string>\r\n
+    Pattern: +<string-in-ascii-encoding>\r\n
 
     Must not contain CR(\r) or LF(\n)
 
@@ -17,6 +17,19 @@ Arrays
     Pattern: *<number-of-elements>\r\n<element-1>...<element-n>
 
     "number-of-elements" - number of elements, encoded in ASCII
+
+Simple errors
+
+    -<string-in-ascii-encoding>\r\n
+
+    Must not contain CR(\r) or LF(\n)
+
+    Examples:
+        -ERR unknown command 'asdf'
+
+        The first upper-case word after the -, up to the first space or newline,
+        represents the kind of error returned. This word is called an error prefix.
+        Note that the error prefix is a convention used by ARCHKE
 
 Command execution user request
 
@@ -33,6 +46,14 @@ SET command
 
     Example of SET command, encoded:
 
-	^20\r\n*3\r\n+SET\r\n$5\r\nMYKEY$6\r\nMYVALUE
+    Request:
+	    ^20\r\n*3\r\n+SET\r\n$5\r\nMYKEY$6\r\nMYVALUE
+
+    Responses:
+        Success:
+            +OK\r\n
+
+        Error:
+            -ERR <cause>\r\n
 
     This command creates a key-value pair "MYKEY"->"MYVALUE"

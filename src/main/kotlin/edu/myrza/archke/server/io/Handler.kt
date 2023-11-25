@@ -1,7 +1,7 @@
 package edu.myrza.archke.server.io
 
 import edu.myrza.archke.client.Command
-import edu.myrza.archke.server.io.Processor.State.*
+import edu.myrza.archke.server.io.Handler.State.*
 import edu.myrza.archke.server.controller.Controller
 import edu.myrza.archke.server.controller.DefaultController
 import edu.myrza.archke.util.getBytes
@@ -11,7 +11,7 @@ import java.nio.channels.SelectionKey
 import java.nio.channels.Selector
 import java.nio.channels.SocketChannel
 
-class Processor private constructor (
+class Handler private constructor (
     private var key: SelectionKey,
     private val channel: SocketChannel,
     private val controller: Controller
@@ -101,11 +101,11 @@ class Processor private constructor (
         // 4 bytes - payload length
         private const val HEADER_SIZE = 8
 
-        fun create(channel: SocketChannel, selector: Selector): Processor {
+        fun create(channel: SocketChannel, selector: Selector): Handler {
             channel.configureBlocking(false)
             val key = channel.register(selector, SelectionKey.OP_READ)
             val messageConsumer = DefaultController()
-            return Processor(key, channel, messageConsumer)
+            return Handler(key, channel, messageConsumer)
         }
 
     }

@@ -11,7 +11,7 @@ class DefaultController : Controller {
         }
         // 3. encode output (in this case, we do not need to)
         // 4. return output
-        return ByteArray(0)
+        return "+OK\r\n".toByteArray(Charsets.US_ASCII)
     }
 
 }

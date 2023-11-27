@@ -9,11 +9,11 @@ import java.nio.channels.spi.AbstractSelectableChannel
 class Acceptor private constructor(
     private val selector: Selector,
     private val channel: ServerSocketChannel,
-    private val processors: MutableMap<AbstractSelectableChannel, Runnable>
+    private val handlers: MutableMap<AbstractSelectableChannel, Runnable>
 ) : Runnable {
 
     override fun run() {
-        channel.accept().also { processors[it] = Handler.create(it, selector) }
+        channel.accept().also { handlers[it] = Handler.create(it, selector) }
     }
 
     companion object {

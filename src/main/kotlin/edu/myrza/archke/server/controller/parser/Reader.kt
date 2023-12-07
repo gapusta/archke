@@ -11,47 +11,40 @@ class Reader {
     private var payloadLength = 0
 
     fun read(chunk: ByteArray, length: Int) {
-        var current = 0
+        for (current in 0 until length) {
+            if (state == READ_COMMAND) {
+                state = READ_LENGTH
+                continue
+            }
 
-        if (state == READ_COMMAND && length > 0) {
-            // command has been read, right now we only have single command (PRINT)
-            state = READ_LENGTH
-            if (length > 1) current = 1 else return
-        }
-
-        if (state == READ_LENGTH) {
-            while (current < length) {
+            if (state == READ_LENGTH) {
                 val number = chunk[current] - 0x30 // 0x30 == '0' in ascii
 
                 if (number in 0..9) {
                     payloadLength = payloadLength * 10 + number
-                    current++
-                    continue
+                } else {
+                    if (chunk[current] != CR) throw IllegalArgumentException("CR was expected")
+                    state = READ_LF
                 }
-
-                // length has been read
-                state = READ_CR
-                break
+                continue
             }
-        }
 
-        if (state == READ_CR) {
-            if (current >= length) return // CR has not been received yet
-            if (chunk[current++] != CR) throw IllegalArgumentException("CR was expected")
-            state = READ_LF
-        }
+            if (state == READ_LF) {
+                if (chunk[current] != LF) throw IllegalArgumentException("LF was expected")
+                if (payloadLength > 0) {
+                    payload = ByteBuffer.allocate(payloadLength)
+                    state = READ_PAYLOAD
+                    continue
+                } else {
+                    state = DONE
+                    break
+                }
+            }
 
-        if (state == READ_LF) {
-            if (current >= length) return // LF has not been received yet
-            if (chunk[current++] != LF) throw IllegalArgumentException("LF was expected")
-
-            payload = ByteBuffer.allocate(payloadLength)
-            state = READ_PAYLOAD
-        }
-
-        if (state == READ_PAYLOAD) {
-            if (current < length) for (idx in current until length) payload.put(chunk[idx])
-            if (!payload.hasRemaining() || payloadLength == 0) state = DONE
+            if (state == READ_PAYLOAD) {
+                payload.put(chunk[current])
+                if (!payload.hasRemaining()) state = DONE
+            }
         }
     }
 
@@ -64,7 +57,6 @@ class Reader {
     enum class State {
         READ_COMMAND,
         READ_LENGTH,
-        READ_CR,
         READ_LF,
         READ_PAYLOAD,
         DONE

@@ -13,9 +13,9 @@ class ControllerImpl : Controller {
 
         if(!reader.done()) return Result(NOT_DONE, ByteArray(0))
 
-        val message = String(reader.payload(), Charsets.UTF_8)
+//        val message = String(reader.payload(), Charsets.UTF_8)
 
-        println("MESSAGE : $message")
+//        println("MESSAGE : $message")
 
         reader = Reader()
 

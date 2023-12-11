@@ -5,65 +5,88 @@ import java.nio.ByteBuffer
 
 class Reader {
 
-    private var state = READ_COMMAND
+    private var state = READ_ARRAY
 
-    private var payload = ByteBuffer.allocate(0)
-    private var payloadLength = 0
+    private val array: MutableList<ByteArray> = mutableListOf()
+    private var arrayLength = 0
+
+    private var binary: ByteBuffer = ByteBuffer.allocate(0)
+
+    private var currentLength = 0
 
     fun read(chunk: ByteArray, length: Int) {
-        for (current in 0 until length) {
-            if (state == READ_COMMAND) {
-                state = READ_LENGTH
+        for (idx in 0 until length) {
+            val current = chunk[idx]
+
+            if (state == READ_ARRAY) {
+                if (current != ARRAY) throw IllegalStateException("* was expected")
+                state = READ_ARRAY_LENGTH
                 continue
             }
 
-            if (state == READ_LENGTH) {
-                val number = chunk[current] - 0x30 // 0x30 == '0' in ascii
+            if (state == READ_BINARY) {
+                if (current != BINARY_STR) throw IllegalStateException("$ was expected")
+                state = READ_BINARY_LENGTH
+                continue
+            }
+
+            if (state == READ_ARRAY_LENGTH || state == READ_BINARY_LENGTH) {
+                val number = current - 0x30 // 0x30 == '0' in ascii
 
                 if (number in 0..9) {
-                    payloadLength = payloadLength * 10 + number
-                } else {
-                    if (chunk[current] != CR) throw IllegalArgumentException("CR was expected")
-                    state = READ_LF
-                }
-                continue
-            }
-
-            if (state == READ_LF) {
-                if (chunk[current] != LF) throw IllegalArgumentException("LF was expected")
-                if (payloadLength > 0) {
-                    payload = ByteBuffer.allocate(payloadLength)
-                    state = READ_PAYLOAD
+                    currentLength = currentLength * 10 + number
                     continue
-                } else {
-                    state = DONE
-                    break
+                }
+
+                if (current == CR) continue
+
+                if (current == LF && state == READ_ARRAY_LENGTH) {
+                    arrayLength = currentLength
+                    currentLength = 0
+                    state = READ_BINARY
+                }
+
+                if (current == LF && state == READ_BINARY_LENGTH) {
+                    binary = ByteBuffer.wrap(ByteArray(currentLength))
+                    currentLength = 0
+                    state = READ_BINARY_DATA
+                    continue
                 }
             }
 
-            if (state == READ_PAYLOAD) {
-                payload.put(chunk[current])
-                if (!payload.hasRemaining()) state = DONE
+            if (state == READ_BINARY_DATA && binary.hasRemaining()) {
+                binary.put(current)
+            }
+
+            if (state == READ_BINARY_DATA && !binary.hasRemaining()) {
+                array.add(binary.array())
+                arrayLength--
+                state = if (arrayLength == 0) DONE else READ_BINARY
             }
         }
     }
 
     fun state(): State = state
 
-    fun payload(): ByteArray = payload.array()
+    fun payload(): List<ByteArray> = array
 
     fun done(): Boolean = state() == DONE
 
     enum class State {
-        READ_COMMAND,
-        READ_LENGTH,
+        READ_ARRAY,
+        READ_ARRAY_LENGTH,
+        READ_BINARY,
+        READ_BINARY_LENGTH,
+        READ_BINARY_DATA,
+
         READ_LF,
-        READ_PAYLOAD,
         DONE
     }
 
     companion object {
-        private const val CR = 0x0d.toByte()
-        private const val LF = 0x0a.toByte()
+        private const val ARRAY = 0x2a.toByte() // '*'
+        private const val BINARY_STR = 0x24.toByte() // '$'
+        private const val CR = 0x0d.toByte() // '\r'
+        private const val LF = 0x0a.toByte() // '\n'
     }
 }

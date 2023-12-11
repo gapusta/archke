@@ -31,14 +31,6 @@ Simple errors
         represents the kind of error returned. This word is called an error prefix.
         Note that the error prefix is a convention used by ARCHKE
 
-Command execution user request
-
-    Pattern: ^<length>\r\n<packet-data>
-
-    "length" - the packet's length (in bytes), encoded in ASCII
-
-
-
 
 SET command
 
@@ -47,7 +39,7 @@ SET command
     Example of SET command, encoded:
 
     Request:
-	    ^20\r\n*3\r\n+SET\r\n$5\r\nMYKEY$6\r\nMYVALUE
+	    *3\r\n$3\r\nSET$5\r\nMYKEY$7\r\nMYVALUE
 
     Responses:
         Success:

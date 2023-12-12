@@ -43,18 +43,17 @@ class Reader {
                 if (current == LF && state == READ_ARRAY_LENGTH) {
                     arrayLength = currentLength
                     currentLength = 0
-                    state = READ_BINARY
+                    state = if (arrayLength == 0) DONE else READ_BINARY
                 }
 
                 if (current == LF && state == READ_BINARY_LENGTH) {
                     binary = ByteBuffer.wrap(ByteArray(currentLength))
                     currentLength = 0
                     state = READ_BINARY_DATA
-                    continue
                 }
             }
 
-            if (state == READ_BINARY_DATA && binary.hasRemaining()) {
+            if (state == READ_BINARY_DATA && binary.hasRemaining() && current != LF) {
                 binary.put(current)
             }
 

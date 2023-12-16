@@ -3,30 +3,23 @@ package edu.myrza.archke.example.client.console
 import edu.myrza.archke.client.Session
 
 fun main(args: Array<String>) {
-    // 1. open session
     println("Session opening...")
 
     val host = "localhost"
     val port = 9999
     val session = Session.open(host, port)
 
-    println("Session has been opened successfully [ host : $host, port : $port ]")
+    println("Session opened")
 
-    // 2. read input string
-    while (true) {
-        print("> ")
+    val key = "MYKEY".toByteArray(Charsets.US_ASCII)
+    val value = "MYVALUE".toByteArray(Charsets.US_ASCII)
 
-        val message = readLine() ?: break
+    session.set(key, value)
+    val response = session.get(key)
 
-        if (message == "exit") break
-
-        // 3. send to the server
-        session.send(message)
-    }
-
-    println("Session close...")
+    println(String(response, Charsets.US_ASCII))
 
     session.close()
 
-    println("Session has been closed successfully")
+    println("Session closed")
 }

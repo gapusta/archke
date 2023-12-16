@@ -1,46 +1,53 @@
 package edu.myrza.archke.client
 
-import edu.myrza.archke.util.findEnd
 import java.net.Socket
 
 class SessionImpl internal constructor(private val socket: Socket) : Session {
 
     private val inputStream = socket.getInputStream()
     private val outputStream = socket.getOutputStream()
-    private val command = "^".toByteArray(Charsets.US_ASCII)
-    private val divider = "\r\n".toByteArray(Charsets.US_ASCII)
 
-//      TODO: Test send and flush the divider control symbols separately
-//    private val divider1 = "\r".toByteArray(Charsets.US_ASCII)
-//    private val divider2 = "\n".toByteArray(Charsets.US_ASCII)
+    override fun set(key: ByteArray, value: ByteArray): String {
+        val header = "*3\r\n$3\r\nSET".toByteArray(Charsets.US_ASCII)
+        val keyHeader = "$${key.size}\r\n".toByteArray(Charsets.US_ASCII)
+        val valueHeader = "$${value.size}\r\n".toByteArray(Charsets.US_ASCII)
 
-    override fun send(msg: String) {
-        // write
-        val payload = msg.toByteArray(Charsets.UTF_8)
-        val length = payload.size.toString().toByteArray(Charsets.US_ASCII)
-
-        outputStream.write(command)
-        outputStream.write(length)
-        outputStream.write(divider)
-        outputStream.write(payload)
+        outputStream.write(header)
+        outputStream.write(keyHeader)
+        outputStream.write(key)
+        outputStream.write(valueHeader)
+        outputStream.write(value)
         outputStream.flush()
 
-        // read
-        val response = ByteArray(RESPONSE_MAX_SIZE)
-        var prevBytesRead = 0
-        var bytesRead = 0
-        var end = 0
-
-        while (bytesRead < RESPONSE_MAX_SIZE) {
-            prevBytesRead = bytesRead
-            bytesRead += inputStream.read(response)
-
-            end = response.findEnd(maxOf(prevBytesRead - 1, 0) , bytesRead) ?: continue
-            break
+        val reader = SimpleStringReader()
+        val buffer = ByteArray(BUFFER_MAX_SIZE)
+        while (true) {
+            val read = inputStream.read(buffer)
+            reader.read(buffer, read)
+            if (reader.done()) break
         }
-        val responseMsg = String(response, 1, end - 1, Charsets.US_ASCII)
 
-        println("SERVER RESPONSE [ msg : $responseMsg ]")
+        return reader.payload()
+    }
+
+    override fun get(key: ByteArray): ByteArray {
+        val header = "*2\r\n$3\r\nGET".toByteArray(Charsets.US_ASCII)
+        val keyHeader = "$${key.size}\r\n".toByteArray(Charsets.US_ASCII)
+
+        outputStream.write(header)
+        outputStream.write(keyHeader)
+        outputStream.write(key)
+        outputStream.flush()
+
+        val reader = BinaryStringReader()
+        val buffer = ByteArray(BUFFER_MAX_SIZE)
+        while (true) {
+            val read = inputStream.read(buffer)
+            reader.read(buffer, read)
+            if (reader.done()) break
+        }
+
+        return reader.payload()
     }
 
     override fun close() {
@@ -48,7 +55,7 @@ class SessionImpl internal constructor(private val socket: Socket) : Session {
     }
 
     companion object {
-        private const val RESPONSE_MAX_SIZE = 256
+        private const val BUFFER_MAX_SIZE = 1024
     }
 
 }

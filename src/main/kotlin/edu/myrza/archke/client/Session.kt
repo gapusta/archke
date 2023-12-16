@@ -5,7 +5,9 @@ import java.net.Socket
 
 interface Session : Closeable {
 
-    fun send(msg: String)
+    fun set(key: ByteArray, value: ByteArray): String
+
+    fun get(key: ByteArray): ByteArray
 
     override fun close()
 

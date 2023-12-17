@@ -1,11 +1,8 @@
 package edu.myrza.archke.server.io
 
+import edu.myrza.archke.server.controller.*
 import edu.myrza.archke.server.io.Handler.State.*
-import edu.myrza.archke.server.controller.DispatcherController
-import edu.myrza.archke.server.controller.DispatcherControllerImpl
-import edu.myrza.archke.server.controller.GetCommandController
-import edu.myrza.archke.server.controller.SetCommandController
-import edu.myrza.archke.server.service.KeyValueServiceImpl
+import edu.myrza.archke.server.service.GlobalKeyValueServiceImpl
 import java.nio.ByteBuffer
 import java.nio.channels.SelectionKey
 import java.nio.channels.Selector
@@ -77,10 +74,11 @@ class Handler private constructor (
         fun create(channel: SocketChannel, selector: Selector): Handler {
             channel.configureBlocking(false)
             val key = channel.register(selector, SelectionKey.OP_READ)
-            val service = KeyValueServiceImpl()
+            val service = GlobalKeyValueServiceImpl()
             val messageConsumer = DispatcherControllerImpl(listOf(
                 SetCommandController(service),
-                GetCommandController(service)
+                GetCommandController(service),
+                DelCommandController(service)
             ))
             return Handler(key, channel, messageConsumer)
         }

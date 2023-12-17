@@ -18,6 +18,17 @@ Arrays
 
     "number-of-elements" - number of elements, encoded in ASCII
 
+Integers
+
+    Pattern: :[+|-]<value>\r\n
+
+    - The colon (:) as the first byte
+    - An optional plus(+) or minus(-) as the sign
+    - "value" = One or more decimal digits (0..9) as the integer's unsigned, base-10 value
+    - The CRLF terminator
+
+    For example: ":0\r\n", ":1000\r\n", ":-69\r\n"
+
 Simple errors
 
     -<string-in-ascii-encoding>\r\n

@@ -1,6 +1,7 @@
 package edu.myrza.archke.example.client.console
 
 import edu.myrza.archke.client.Session
+import java.util.regex.Pattern
 
 fun main(args: Array<String>) {
     println("Session opening...")
@@ -11,13 +12,31 @@ fun main(args: Array<String>) {
 
     println("Session opened")
 
-    val key = "MYKEY".toByteArray(Charsets.US_ASCII)
-    val value = "MYVALUE".toByteArray(Charsets.US_ASCII)
+    while (true) {
+        print("> ")
 
-    session.set(key, value)
-    val response = session.get(key)
+        val line = readLine()!!.trim()
 
-    println(String(response, Charsets.US_ASCII))
+        if (line == "exit") break
+
+        if (line.startsWith("SET")) {
+            val words = line.split(Pattern.compile("[ ]+"))
+            val key = words[1].toByteArray(Charsets.US_ASCII)
+            val value = words[2].toByteArray(Charsets.UTF_8)
+            val response = session.set(key, value)
+
+            println("[SET] $response")
+        }
+
+        if (line.startsWith("GET")) {
+            val words = line.split(Pattern.compile("[ ]+"))
+            val key = words[1].toByteArray(Charsets.US_ASCII)
+            val response = session.get(key)
+            val value = String(response, Charsets.UTF_8)
+
+            println("[GET] $value")
+        }
+    }
 
     session.close()
 

@@ -1,6 +1,6 @@
 package edu.myrza.archke.server.controller
 
-interface DispatcherController {
+interface Dispatcher {
 
     /*
     * It reads request input chunk, if there was enough chunks read

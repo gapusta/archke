@@ -1,32 +1,17 @@
 package edu.myrza.archke.server.io
 
-import java.net.InetSocketAddress
-import java.nio.channels.SelectionKey
-import java.nio.channels.Selector
+import edu.myrza.archke.server.io.factory.HandlerFactory
 import java.nio.channels.ServerSocketChannel
 import java.nio.channels.spi.AbstractSelectableChannel
 
-class Acceptor private constructor(
-    private val selector: Selector,
+class Acceptor (
     private val channel: ServerSocketChannel,
+    private val factory: HandlerFactory,
     private val handlers: MutableMap<AbstractSelectableChannel, Runnable>
 ) : Runnable {
 
     override fun run() {
-        channel.accept().also { handlers[it] = Handler.create(it, selector) }
+        channel.accept().also { handlers[it] = factory.get(it) }
     }
 
-    companion object {
-        fun create(port: Int,
-                   selector: Selector,
-                   processors: MutableMap<AbstractSelectableChannel, Runnable>
-        ): Acceptor {
-            val serverChannel = ServerSocketChannel.open().apply {
-                this.socket().bind(InetSocketAddress(port))
-                this.configureBlocking(false)
-                this.register(selector, SelectionKey.OP_ACCEPT)
-            }
-            return Acceptor(selector, serverChannel, processors).apply { processors[serverChannel] = this }
-        }
-    }
 }

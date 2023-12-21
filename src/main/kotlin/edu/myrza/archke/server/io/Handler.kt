@@ -8,10 +8,10 @@ import java.nio.channels.SelectionKey
 import java.nio.channels.Selector
 import java.nio.channels.SocketChannel
 
-class Handler private constructor (
+class Handler (
     private var key: SelectionKey,
     private val channel: SocketChannel,
-    private val controller: DispatcherController
+    private val controller: Dispatcher
 ) : Runnable {
 
     private var state = READ
@@ -70,18 +70,6 @@ class Handler private constructor (
     companion object {
 
         private const val BUFFER_SIZE = 128 * 1024 // 128 KB
-
-        fun create(channel: SocketChannel, selector: Selector): Handler {
-            channel.configureBlocking(false)
-            val key = channel.register(selector, SelectionKey.OP_READ)
-            val service = GlobalKeyValueServiceImpl()
-            val messageConsumer = DispatcherControllerImpl(listOf(
-                SetCommandController(service),
-                GetCommandController(service),
-                DelCommandController(service)
-            ))
-            return Handler(key, channel, messageConsumer)
-        }
 
     }
 

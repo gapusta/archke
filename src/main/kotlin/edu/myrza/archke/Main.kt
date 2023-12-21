@@ -1,9 +1,8 @@
 package edu.myrza.archke
 
-import edu.myrza.archke.server.io.Reactor
+import edu.myrza.archke.server.Server
 
 fun main(args: Array<String>) {
-    val reactor = Reactor.create(9999)
-    val thread = Thread(reactor)
-    thread.start()
+    val server = Server(9999)
+    server.start()
 }

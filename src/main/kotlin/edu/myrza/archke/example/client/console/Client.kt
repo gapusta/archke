@@ -25,7 +25,7 @@ fun main(args: Array<String>) {
             val value = words[2].toByteArray(Charsets.UTF_8)
             val response = session.set(key, value)
 
-            println("[SET] $response")
+            println(response)
         }
 
         if (line.startsWith("GET")) {
@@ -34,7 +34,7 @@ fun main(args: Array<String>) {
             val response = session.get(key)
             val value = String(response, Charsets.UTF_8)
 
-            println("[GET] $value")
+            println(value)
         }
     }
 

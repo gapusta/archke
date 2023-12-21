@@ -2,7 +2,7 @@ package edu.myrza.archke.server.controller
 
 import edu.myrza.archke.server.controller.parser.Reader
 
-class DispatcherControllerImpl(controllers: List<Controller>) : DispatcherController {
+class DispatcherImpl(controllers: List<Controller>) : Dispatcher {
 
     private val controllers = controllers.groupBy { it.command() }
     private var reader = Reader()

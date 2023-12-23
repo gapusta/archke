@@ -5,13 +5,11 @@ import edu.myrza.archke.server.controller.GetCommandController
 import edu.myrza.archke.server.controller.SetCommandController
 import edu.myrza.archke.server.io.Acceptor
 import edu.myrza.archke.server.io.Reactor
-import edu.myrza.archke.server.io.factory.HandlerFactoryImpl
 import edu.myrza.archke.server.service.GlobalKeyValueServiceImpl
 import java.net.InetSocketAddress
 import java.nio.channels.SelectionKey
 import java.nio.channels.Selector
 import java.nio.channels.ServerSocketChannel
-import java.nio.channels.spi.AbstractSelectableChannel
 
 class Server(private val port: Int) {
 
@@ -32,18 +30,16 @@ class Server(private val port: Int) {
 
         // IO LAYER
         val selector = Selector.open()
-        val handlers = mutableMapOf<AbstractSelectableChannel, Runnable>()
+
         val serverChannel = ServerSocketChannel.open().apply {
             socket().bind(InetSocketAddress(port))
             configureBlocking(false)
-            register(selector, SelectionKey.OP_ACCEPT)
         }
-        val handlerFactory = HandlerFactoryImpl(selector, dispatcher) // handlers
+        val key = serverChannel.register(selector, SelectionKey.OP_ACCEPT)
+        val acceptor = Acceptor(serverChannel, selector, dispatcher)
+        key.attach(acceptor)
 
-        val acceptor = Acceptor(serverChannel, handlerFactory, handlers)
-        handlers[serverChannel] = acceptor
-
-        reactor = Reactor(selector, handlers)
+        reactor = Reactor(selector)
     }
 
     private fun run() {

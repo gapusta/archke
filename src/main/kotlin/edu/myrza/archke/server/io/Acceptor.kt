@@ -1,17 +1,22 @@
 package edu.myrza.archke.server.io
 
-import edu.myrza.archke.server.io.factory.HandlerFactory
+import edu.myrza.archke.server.controller.Dispatcher
+import java.nio.channels.SelectionKey
+import java.nio.channels.Selector
 import java.nio.channels.ServerSocketChannel
-import java.nio.channels.spi.AbstractSelectableChannel
 
 class Acceptor (
-    private val channel: ServerSocketChannel,
-    private val factory: HandlerFactory,
-    private val handlers: MutableMap<AbstractSelectableChannel, Runnable>
+    private val serverChannel: ServerSocketChannel,
+    private val selector: Selector,
+    private val dispatcher: Dispatcher
 ) : Runnable {
 
     override fun run() {
-        channel.accept().also { handlers[it] = factory.get(it) }
+        val channel = serverChannel.accept().apply { configureBlocking(false) }
+        val key = channel.register(selector, SelectionKey.OP_READ)
+        val handler = Handler(key, channel, dispatcher)
+
+        key.attach(handler)
     }
 
 }

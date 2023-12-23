@@ -2,10 +2,8 @@ package edu.myrza.archke.server.io
 
 import edu.myrza.archke.server.controller.*
 import edu.myrza.archke.server.io.Handler.State.*
-import edu.myrza.archke.server.service.GlobalKeyValueServiceImpl
 import java.nio.ByteBuffer
 import java.nio.channels.SelectionKey
-import java.nio.channels.Selector
 import java.nio.channels.SocketChannel
 
 class Handler (

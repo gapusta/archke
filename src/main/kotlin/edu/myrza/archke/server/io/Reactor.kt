@@ -1,12 +1,8 @@
 package edu.myrza.archke.server.io
 
 import java.nio.channels.Selector
-import java.nio.channels.spi.AbstractSelectableChannel
 
-class Reactor (
-    private val selector: Selector,
-    private val handlers: MutableMap<AbstractSelectableChannel, Runnable>,
-) : Runnable {
+class Reactor (private val selector: Selector) : Runnable {
 
     override fun run() {
         // Event loop
@@ -16,13 +12,9 @@ class Reactor (
             val selected = selector.selectedKeys()
 
             for(key in selected) {
-                val channel = key.channel()
+                val handler = key.attachment() as Runnable
 
-                handlers[channel]!!.run()
-
-                // keys can get cancelled during processor execution,
-                // so we should remove processors of these keys
-                if (!key.isValid) handlers.remove(channel)
+                handler.run()
             }
 
             selected.clear()

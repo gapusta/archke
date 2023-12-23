@@ -1,6 +1,7 @@
-package edu.myrza.archke.server.controller
+package edu.myrza.archke.server.dispatcher
 
-import edu.myrza.archke.server.controller.parser.Reader
+import edu.myrza.archke.server.controller.Controller
+import edu.myrza.archke.server.dispatcher.parser.Reader
 
 class DispatcherImpl(controllers: List<Controller>) : Dispatcher {
 

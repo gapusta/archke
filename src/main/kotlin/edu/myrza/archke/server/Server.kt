@@ -1,8 +1,8 @@
 package edu.myrza.archke.server
 
-import edu.myrza.archke.server.controller.DispatcherImpl
 import edu.myrza.archke.server.controller.GetCommandController
 import edu.myrza.archke.server.controller.SetCommandController
+import edu.myrza.archke.server.dispatcher.DispatcherFactoryImpl
 import edu.myrza.archke.server.io.Acceptor
 import edu.myrza.archke.server.io.Reactor
 import edu.myrza.archke.server.service.GlobalKeyValueServiceImpl
@@ -26,7 +26,7 @@ class Server(private val port: Int) {
 
         // CONTROLLER LAYER
         val controllers = listOf(SetCommandController(service), GetCommandController(service))
-        val dispatcher = DispatcherImpl(controllers)
+        val dispatcherFactory = DispatcherFactoryImpl(controllers)
 
         // IO LAYER
         val selector = Selector.open()
@@ -36,7 +36,7 @@ class Server(private val port: Int) {
             configureBlocking(false)
         }
         val key = serverChannel.register(selector, SelectionKey.OP_ACCEPT)
-        val acceptor = Acceptor(serverChannel, selector, dispatcher)
+        val acceptor = Acceptor(serverChannel, selector, dispatcherFactory)
         key.attach(acceptor)
 
         reactor = Reactor(selector)

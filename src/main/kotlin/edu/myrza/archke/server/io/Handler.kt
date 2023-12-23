@@ -1,6 +1,6 @@
 package edu.myrza.archke.server.io
 
-import edu.myrza.archke.server.controller.*
+import edu.myrza.archke.server.dispatcher.Dispatcher
 import edu.myrza.archke.server.io.Handler.State.*
 import java.nio.ByteBuffer
 import java.nio.channels.SelectionKey

@@ -2,6 +2,7 @@ package edu.myrza.archke.server.io
 
 import edu.myrza.archke.server.dispatcher.Dispatcher
 import edu.myrza.archke.server.io.Handler.State.*
+import java.net.SocketException
 import java.nio.ByteBuffer
 import java.nio.channels.SelectionKey
 import java.nio.channels.SocketChannel
@@ -19,9 +20,17 @@ class Handler (
     private var outBuffers = emptyArray<ByteBuffer>()
 
     override fun run() {
-        when (state) {
-            READ -> read()
-            WRITE -> write()
+        try {
+            when (state) {
+                READ -> read()
+                WRITE -> write()
+            }
+        } catch (ex: SocketException) {
+            when (ex.message) {
+                // one of the possible causes of 'Connection reset' might be that
+                // other peer abruptly closed the connection ('RST'). We cannot do much anyway other than clean up.
+                "Connection reset" -> channel.close()
+            }
         }
     }
 

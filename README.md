@@ -17,3 +17,4 @@
 - https://docs.oracle.com/javase/8/docs/api/java/util/IdentityHashMap.html
 - https://cr.yp.to/proto/netstrings.txt
 - https://github.com/PeterScott/netstring-c
+- https://docs.oracle.com/javase/8/docs/api/java/nio/channels/SelectableChannel.html

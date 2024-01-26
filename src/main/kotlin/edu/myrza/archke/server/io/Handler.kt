@@ -2,6 +2,7 @@ package edu.myrza.archke.server.io
 
 import edu.myrza.archke.server.dispatcher.Dispatcher
 import edu.myrza.archke.server.io.Handler.State.*
+import java.io.IOException
 import java.net.SocketException
 import java.nio.ByteBuffer
 import java.nio.channels.SelectionKey
@@ -25,12 +26,11 @@ class Handler (
                 READ -> read()
                 WRITE -> write()
             }
-        } catch (ex: SocketException) {
-            when (ex.message) {
-                // one of the possible causes of 'Connection reset' might be that
-                // other peer abruptly closed the connection ('RST'). We cannot do much anyway other than clean up.
-                "Connection reset" -> channel.close()
-            }
+        }
+        // one of the possible causes of SocketException is RST (client abruptly closed the connection)
+        catch (ex: SocketException) {
+            println("Channel $state error : ${ex.message}")
+            cleanUp()
         }
     }
 
@@ -38,8 +38,7 @@ class Handler (
         val read = channel.read(inBuffer)
 
         if (read == -1) { // client signaled he will not send anything (FIN, ACK)
-            channel.close()
-            println("INFO : Connection closed")
+            cleanUp()
             return
         }
 
@@ -72,12 +71,18 @@ class Handler (
         }
     }
 
+    private fun cleanUp() {
+        try {
+            channel.close() // will also implicitly cancel selection key
+            println("Channel closed")
+        } catch (ex: IOException) {
+            println("Channel close error : ${ex.message}")
+        }
+    }
+
     private enum class State { READ, WRITE }
 
     companion object {
-
         private const val BUFFER_SIZE = 128 * 1024 // 128 KB
-
     }
-
 }

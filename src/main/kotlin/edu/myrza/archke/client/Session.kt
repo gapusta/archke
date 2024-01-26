@@ -15,7 +15,7 @@ interface Session : Closeable {
 
         fun open(host: String, port: Int): Session {
             val socket = Socket(host, port)
-            // socket.setSoLinger(true, 0) // Will trigger RST when closing the socket
+//            socket.setSoLinger(true, 0) // Will trigger RST when closing the socket
 
             return SessionImpl(socket)
         }

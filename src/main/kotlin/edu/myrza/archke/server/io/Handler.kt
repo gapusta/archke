@@ -1,6 +1,7 @@
 package edu.myrza.archke.server.io
 
-import edu.myrza.archke.server.dispatcher.Dispatcher
+import edu.myrza.archke.server.controller.Controller
+import edu.myrza.archke.server.controller.parser.Reader
 import edu.myrza.archke.server.io.Handler.State.*
 import java.io.IOException
 import java.net.SocketException
@@ -11,7 +12,7 @@ import java.nio.channels.SocketChannel
 class Handler (
     private var key: SelectionKey,
     private val channel: SocketChannel,
-    private val controller: Dispatcher
+    private val controller: Controller
 ) : Runnable {
 
     private var state = READ
@@ -27,9 +28,9 @@ class Handler (
                 WRITE -> write()
             }
         }
-        // one of the possible causes of SocketException is RST (client abruptly closed the connection)
         catch (ex: SocketException) {
-            println("Channel $state error : ${ex.message}")
+            // one of the possible causes of SocketException is RST (client abruptly closed the connection)
+            println("Connection error during [ $state ] event processing : ${ex.message}")
             cleanUp()
         }
     }
@@ -74,9 +75,9 @@ class Handler (
     private fun cleanUp() {
         try {
             channel.close() // will also implicitly cancel selection key
-            println("Channel closed")
+            println("Connection closed")
         } catch (ex: IOException) {
-            println("Channel close error : ${ex.message}")
+            println("Error during connection closing : ${ex.message}")
         }
     }
 

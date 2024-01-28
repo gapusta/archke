@@ -1,6 +1,6 @@
-package edu.myrza.archke.server.dispatcher.parser
+package edu.myrza.archke.server.controller.parser
 
-import edu.myrza.archke.server.dispatcher.parser.Reader.State.*
+import edu.myrza.archke.server.controller.parser.Reader.State.*
 import java.nio.ByteBuffer
 
 class Reader {

@@ -1,6 +1,6 @@
-package edu.myrza.archke.server.service
+package edu.myrza.archke.server.db
 
-interface GlobalKeyValueService {
+interface KeyValueStorage {
 
     fun set(key: ByteArray, value: ByteArray)
 

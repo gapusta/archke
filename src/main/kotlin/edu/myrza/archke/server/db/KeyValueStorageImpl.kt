@@ -1,6 +1,6 @@
-package edu.myrza.archke.server.service
+package edu.myrza.archke.server.db
 
-class GlobalKeyValueServiceImpl : GlobalKeyValueService {
+class KeyValueStorageImpl : KeyValueStorage {
 
     private val map = mutableMapOf<Int, ByteArray>()
 

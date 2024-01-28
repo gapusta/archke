@@ -1,15 +1,15 @@
-package edu.myrza.archke.server.controller
+package edu.myrza.archke.server.command
 
-import edu.myrza.archke.server.service.GlobalKeyValueService
+import edu.myrza.archke.server.db.KeyValueStorage
 
-class ExistCommandController(private val service: GlobalKeyValueService) : Controller{
+class ExistCommand(private val storage: KeyValueStorage) : Command{
 
     override fun command(): String = "EXISTS"
 
     override fun handle(args: List<ByteArray>): Array<ByteArray> {
         if (args.size != 2) throw IllegalArgumentException("[EXISTS] some arguments are missing")
 
-        val result = service.get(args[1])?.let { EXISTS } ?: NOT_EXISTS
+        val result = storage.get(args[1])?.let { EXISTS } ?: NOT_EXISTS
 
         return arrayOf(result)
     }

@@ -1,6 +1,6 @@
-package edu.myrza.archke.server.controller.parser
+package edu.myrza.archke.server.command.parser
 
-import edu.myrza.archke.server.dispatcher.parser.Reader
+import edu.myrza.archke.server.controller.parser.Reader
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 

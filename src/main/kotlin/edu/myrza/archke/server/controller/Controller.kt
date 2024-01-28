@@ -2,8 +2,11 @@ package edu.myrza.archke.server.controller
 
 interface Controller {
 
-    fun command(): String
-
-    fun handle(args: List<ByteArray>): Array<ByteArray>
+    /*
+    * It reads request input chunk, if there was enough chunks read
+    * it processes the request and returns an output as byte array as well.
+    * Returns null if processing is not done yet
+    * */
+    fun handle(chunk: ByteArray, length: Int): Array<ByteArray>?
 
 }

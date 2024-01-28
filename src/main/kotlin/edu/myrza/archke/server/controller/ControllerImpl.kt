@@ -1,11 +1,11 @@
-package edu.myrza.archke.server.dispatcher
+package edu.myrza.archke.server.controller
 
-import edu.myrza.archke.server.controller.Controller
-import edu.myrza.archke.server.dispatcher.parser.Reader
+import edu.myrza.archke.server.command.Command
+import edu.myrza.archke.server.controller.parser.Reader
 
-class DispatcherImpl(controllers: List<Controller>) : Dispatcher {
+class ControllerImpl(commands: List<Command>) : Controller {
 
-    private val controllers = controllers.groupBy { it.command() }
+    private val commands = commands.groupBy { it.command() }
     private var reader = Reader()
 
     override fun handle(chunk: ByteArray, length: Int): Array<ByteArray>? {
@@ -19,7 +19,7 @@ class DispatcherImpl(controllers: List<Controller>) : Dispatcher {
 
         reader = Reader()
 
-        return controllers[command]!!.first().handle(payload)
+        return commands[command]!!.first().handle(payload)
     }
 
 }

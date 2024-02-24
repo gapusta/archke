@@ -1,4 +1,4 @@
-package edu.myrza.archke.example.client.console
+package edu.myrza.archke.example
 
 import edu.myrza.archke.client.Session
 import java.util.regex.Pattern

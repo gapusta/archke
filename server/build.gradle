@@ -1,9 +1,6 @@
 plugins {
-    id 'org.jetbrains.kotlin.jvm' version '1.9.0'
+    id 'org.jetbrains.kotlin.jvm'
 }
-
-group = 'edu.myrza'
-version = '1.0.0'
 
 repositories {
     mavenCentral()

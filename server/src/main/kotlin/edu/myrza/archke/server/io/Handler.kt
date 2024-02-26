@@ -28,7 +28,7 @@ class Handler (
                 WRITE -> write()
             }
         }
-        catch (ex: SocketException) {
+        catch (ex: IOException) {
             // one of the possible causes of SocketException is RST (client abruptly closed the connection)
             println("Connection error during [ $state ] event processing : ${ex.message}")
             cleanUp()

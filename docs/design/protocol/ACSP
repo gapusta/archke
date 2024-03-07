@@ -29,6 +29,12 @@ Integers
 
     For example: ":0\r\n", ":1000\r\n", ":-69\r\n"
 
+Booleans
+
+    #<t|f>\r\n
+
+    A t character for true values, or an f character for false ones
+
 Nulls
 
     The null data type represents non-existent values.

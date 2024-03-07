@@ -1,5 +1,6 @@
 package edu.myrza.archke.server
 
+import edu.myrza.archke.server.command.ExistCommand
 import edu.myrza.archke.server.command.GetCommand
 import edu.myrza.archke.server.command.SetCommand
 import edu.myrza.archke.server.controller.ControllerSupplierImpl
@@ -26,7 +27,11 @@ class Server(private val port: Int) {
         val service = KeyValueStorageImpl()
 
         // CONTROLLER LAYER
-        val commands = listOf(SetCommand(service), GetCommand(service))
+        val commands = listOf(
+            SetCommand(service),
+            GetCommand(service),
+            ExistCommand(service)
+        )
         val controllerSupplier = ControllerSupplierImpl(commands)
 
         // IO LAYER

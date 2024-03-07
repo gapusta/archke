@@ -35,6 +35,14 @@ fun main(args: Array<String>) {
 
             println(value)
         }
+
+        if (line.startsWith("EXISTS")) {
+            val words = line.split(Pattern.compile("[ ]+"))
+            val key = words[1].toByteArray(Charsets.US_ASCII)
+            val value = session.exists(key)
+
+            println(value)
+        }
     }
 
     session.close()

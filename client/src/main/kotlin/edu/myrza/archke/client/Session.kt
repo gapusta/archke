@@ -9,6 +9,8 @@ interface Session : Closeable {
 
     fun get(key: ByteArray): ByteArray?
 
+    fun exists(key: ByteArray): Boolean
+
     override fun close()
 
     companion object {

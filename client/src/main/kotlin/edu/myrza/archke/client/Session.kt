@@ -7,7 +7,7 @@ interface Session : Closeable {
 
     fun set(key: ByteArray, value: ByteArray): String
 
-    fun get(key: ByteArray): ByteArray
+    fun get(key: ByteArray): ByteArray?
 
     override fun close()
 

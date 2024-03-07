@@ -29,6 +29,14 @@ Integers
 
     For example: ":0\r\n", ":1000\r\n", ":-69\r\n"
 
+Nulls
+
+    The null data type represents non-existent values.
+
+    Nulls' encoding is the underscore (_) character, followed by the CRLF terminator (\r\n):
+
+    _\r\n
+
 Simple errors
 
     -<string-in-ascii-encoding>\r\n
@@ -47,7 +55,7 @@ SET command
 
     Creates key-value pairs. if the key already holds a value, it is overwritten
 
-    Example of SET command, encoded:
+    Example of SET command encoded:
 
     Request:
 	    *3\r\n$3\r\nSET$5\r\nMYKEY$7\r\nMYVALUE
@@ -60,3 +68,20 @@ SET command
             -ERR <cause>\r\n
 
     This command creates a key-value pair "MYKEY"->"MYVALUE"
+
+GET command
+
+    Retrieves a value by given key
+
+    Example of GET command encoded:
+
+    Request:
+        *2\r\n$3\r\nGET$5\r\nMYKEY
+
+    Response:
+        Success:
+            Response value comes as bulk string (for example: $7\r\nMYVALUE) or
+            as Null if no value has been found
+
+        Error:
+            -ERR <cause>\r\n

@@ -30,7 +30,7 @@ class SessionImpl internal constructor(private val socket: Socket) : Session {
         return reader.payload()
     }
 
-    override fun get(key: ByteArray): ByteArray {
+    override fun get(key: ByteArray): ByteArray? {
         val header = "*2\r\n$3\r\nGET".toByteArray(Charsets.US_ASCII)
         val keyHeader = "$${key.size}\r\n".toByteArray(Charsets.US_ASCII)
 
@@ -47,7 +47,7 @@ class SessionImpl internal constructor(private val socket: Socket) : Session {
             if (reader.done()) break
         }
 
-        return reader.payload()
+        return if(!reader.isNull()) reader.payload() else null
     }
 
     override fun close() {

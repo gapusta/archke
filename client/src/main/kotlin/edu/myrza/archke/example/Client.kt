@@ -31,8 +31,7 @@ fun main(args: Array<String>) {
         if (line.startsWith("GET")) {
             val words = line.split(Pattern.compile("[ ]+"))
             val key = words[1].toByteArray(Charsets.US_ASCII)
-            val response = session.get(key)
-            val value = String(response, Charsets.UTF_8)
+            val value = session.get(key)?.let { String(it, Charsets.UTF_8) } ?: "(null)"
 
             println(value)
         }

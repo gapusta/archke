@@ -35,4 +35,16 @@ class BinaryStringReaderTests {
         assertEquals("Catch me if you can, Mr. Holmes", response)
     }
 
+    @Test
+    fun readNullTest() {
+        val reader = BinaryStringReader()
+
+        val data = "_\r\n".toByteArray(Charsets.US_ASCII)
+
+        reader.read(data, data.size)
+
+        assert(reader.done())
+        assert(reader.isNull())
+    }
+
 }

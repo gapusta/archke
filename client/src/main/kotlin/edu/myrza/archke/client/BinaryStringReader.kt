@@ -16,9 +16,17 @@ class BinaryStringReader {
             val current = chunk[idx]
 
             if (state == READ_BINARY) {
-                if (current != BINARY_STR) throw IllegalStateException("$ was expected")
-                state = READ_BINARY_LENGTH
+                state = when(current) {
+                    BINARY_STR -> READ_BINARY_LENGTH
+                    NULL_STR -> READ_NULL
+                    else -> throw IllegalStateException("$ or _ was expected")
+                }
                 continue
+            }
+
+            if (state == READ_NULL) {
+                if (current == CR) continue
+                if (current == LF) state = DONE_NULL
             }
 
             if (state == READ_BINARY_LENGTH) {
@@ -48,23 +56,26 @@ class BinaryStringReader {
         }
     }
 
-    fun state(): State = state
-
     fun payload(): ByteArray = binary.array()
 
-    fun done(): Boolean = state() == DONE
+    fun done(): Boolean = state == DONE || state == DONE_NULL
+
+    fun isNull(): Boolean = state == DONE_NULL
 
     enum class State {
         READ_BINARY,
+        READ_NULL,
         READ_BINARY_LENGTH,
         READ_BINARY_DATA,
 
         READ_LF,
-        DONE
+        DONE,
+        DONE_NULL
     }
 
     companion object {
         private const val BINARY_STR = 0x24.toByte() // '$'
+        private const val NULL_STR = 0x5f.toByte() // '_'
         private const val CR = 0x0d.toByte() // '\r'
         private const val LF = 0x0a.toByte() // '\n'
     }

@@ -10,9 +10,7 @@ class KeyValueStorageImpl : KeyValueStorage {
         map[ByteArrayKey(key)] = value
     }
 
-    override fun delete(key: ByteArray) {
-        map.remove(ByteArrayKey(key))
-    }
+    override fun delete(key: ByteArray): ByteArray? = map.remove(ByteArrayKey(key))
 
     override fun get(key: ByteArray): ByteArray? = map[ByteArrayKey(key)]
 

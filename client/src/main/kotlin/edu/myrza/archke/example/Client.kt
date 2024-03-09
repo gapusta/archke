@@ -19,30 +19,44 @@ fun main(args: Array<String>) {
 
         if (line == "exit") break
 
-        if (line.startsWith("SET")) {
+        if (line.startsWith("SET", true)) {
             val words = line.split(Pattern.compile("[ ]+"))
             val key = words[1].toByteArray(Charsets.US_ASCII)
             val value = words[2].toByteArray(Charsets.UTF_8)
             val response = session.set(key, value)
 
             println(response)
+            continue
         }
 
-        if (line.startsWith("GET")) {
+        if (line.startsWith("GET", true)) {
             val words = line.split(Pattern.compile("[ ]+"))
             val key = words[1].toByteArray(Charsets.US_ASCII)
             val value = session.get(key)?.let { String(it, Charsets.UTF_8) } ?: "(null)"
 
             println(value)
+            continue
         }
 
-        if (line.startsWith("EXISTS")) {
+        if (line.startsWith("EXISTS", true)) {
             val words = line.split(Pattern.compile("[ ]+"))
             val key = words[1].toByteArray(Charsets.US_ASCII)
             val value = session.exists(key)
 
             println(value)
+            continue
         }
+
+        if (line.startsWith("DEL", true)) {
+            val words = line.split(Pattern.compile("[ ]+"))
+            val key = words[1].toByteArray(Charsets.US_ASCII)
+            val value = session.delete(key)
+
+            println(value)
+            continue
+        }
+
+        println("Unknown command")
     }
 
     session.close()

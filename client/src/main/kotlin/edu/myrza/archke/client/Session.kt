@@ -9,6 +9,8 @@ interface Session : Closeable {
 
     fun get(key: ByteArray): ByteArray?
 
+    fun delete(key: ByteArray): Int
+
     fun exists(key: ByteArray): Boolean
 
     override fun close()

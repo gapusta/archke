@@ -108,3 +108,20 @@ EXISTS command
 
         Error:
             -ERR <cause>\r\n
+
+DEL command
+
+    Removes a value from the storage by given key
+
+    Example:
+
+    Request:
+        *2\r\n$6\r\nDEL$5\r\nMYKEY
+
+    Response: returns an amount of deleted values
+        Success:
+            "1" (if a value associated with "MYKEY" has been deleted)
+            "0" (if a value associated with "MYKEY" does not exist)
+
+        Error:
+            -ERR <cause>\r\n

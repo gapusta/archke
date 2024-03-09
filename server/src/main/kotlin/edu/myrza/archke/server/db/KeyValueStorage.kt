@@ -4,7 +4,7 @@ interface KeyValueStorage {
 
     fun set(key: ByteArray, value: ByteArray)
 
-    fun delete(key: ByteArray)
+    fun delete(key: ByteArray): ByteArray?
 
     fun get(key: ByteArray): ByteArray?
 

@@ -1,5 +1,6 @@
 package edu.myrza.archke.server
 
+import edu.myrza.archke.server.command.DelCommand
 import edu.myrza.archke.server.command.ExistCommand
 import edu.myrza.archke.server.command.GetCommand
 import edu.myrza.archke.server.command.SetCommand
@@ -30,6 +31,7 @@ class Server(private val port: Int) {
         val commands = listOf(
             SetCommand(service),
             GetCommand(service),
+            DelCommand(service),
             ExistCommand(service)
         )
         val controllerSupplier = ControllerSupplierImpl(commands)

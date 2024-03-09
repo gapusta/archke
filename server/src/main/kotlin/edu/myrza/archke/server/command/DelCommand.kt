@@ -9,9 +9,15 @@ class DelCommand(private val storage: KeyValueStorage) : Command {
     override fun handle(args: List<ByteArray>): Array<ByteArray> {
         if (args.size != 2) throw IllegalArgumentException("[DEL] some arguments are missing")
 
-        storage.delete(args[1])
+        val key = args[1]
+        val result = storage.delete(key)?.let { DELETED } ?: NOT_FOUND
 
-        return arrayOf("+OK\r\n".toByteArray(Charsets.US_ASCII))
+        return arrayOf(result)
+    }
+
+    companion object {
+        private val DELETED = ":1\r\n".toByteArray(Charsets.US_ASCII) // one value has been deleted
+        private val NOT_FOUND = ":0\r\n".toByteArray(Charsets.US_ASCII) // zero values have been deleted
     }
 
 }

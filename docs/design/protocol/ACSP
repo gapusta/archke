@@ -91,3 +91,20 @@ GET command
 
         Error:
             -ERR <cause>\r\n
+
+EXISTS command
+
+    Returns true if a value associated with a given key exists. Returns false if otherwise
+
+    Example:
+
+    Request:
+        *2\r\n$6\r\nEXISTS$5\r\nMYKEY
+
+    Response:
+        Success:
+            "true" (if a value associated with "MYKEY" exists)
+            "false" (if a value associated with "MYKEY" does not exist)
+
+        Error:
+            -ERR <cause>\r\n

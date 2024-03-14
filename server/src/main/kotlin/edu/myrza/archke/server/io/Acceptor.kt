@@ -1,6 +1,6 @@
 package edu.myrza.archke.server.io
 
-import edu.myrza.archke.server.controller.ControllerSupplier
+import edu.myrza.archke.server.controller.Controller
 import java.io.IOException
 import java.nio.channels.SelectionKey
 import java.nio.channels.Selector
@@ -10,7 +10,7 @@ import java.nio.channels.SocketChannel
 class Acceptor (
     private val serverChannel: ServerSocketChannel,
     private val selector: Selector,
-    private val controllerSupplier: ControllerSupplier
+    private val controller: Controller
 ) : Runnable {
 
     override fun run() {
@@ -22,7 +22,6 @@ class Acceptor (
             return
         }
         val key = channel.register(selector, SelectionKey.OP_READ)
-        val controller = controllerSupplier.get()
         val handler = Handler(key, channel, controller)
 
         key.attach(handler)

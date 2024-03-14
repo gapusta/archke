@@ -6,7 +6,7 @@ class SetCommand(private val storage: KeyValueStorage) : Command {
 
     override fun command(): String = "SET"
 
-    override fun handle(args: List<ByteArray>): Array<ByteArray> {
+    override fun handle(args: Array<ByteArray>): Array<ByteArray> {
         if (args.size != 3) throw IllegalArgumentException("[SET] some arguments are missing")
 
         storage.set(args[1], args[2])

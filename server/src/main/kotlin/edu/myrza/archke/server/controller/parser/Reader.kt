@@ -6,13 +6,12 @@ import java.nio.ByteBuffer
 class Reader {
 
     private var state = READ_ARRAY
-
-    private val array: MutableList<ByteArray> = mutableListOf()
     private var arrayLength = 0
 
     private var binary: ByteBuffer = ByteBuffer.allocate(0)
-
     private var currentLength = 0
+
+    private lateinit var array: ArrayList<ByteArray>
 
     fun read(chunk: ByteArray, length: Int) {
         for (idx in 0 until length) {
@@ -42,6 +41,7 @@ class Reader {
 
                 if (current == LF && state == READ_ARRAY_LENGTH) {
                     arrayLength = currentLength
+                    array = ArrayList(arrayLength)
                     currentLength = 0
                     state = if (arrayLength == 0) DONE else READ_BINARY
                 }
@@ -67,7 +67,7 @@ class Reader {
 
     fun state(): State = state
 
-    fun payload(): List<ByteArray> = array
+    fun payload(): Array<ByteArray> = array.toTypedArray()
 
     fun done(): Boolean = state() == DONE
 

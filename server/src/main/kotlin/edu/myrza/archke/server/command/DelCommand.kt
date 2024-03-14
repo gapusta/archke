@@ -6,7 +6,7 @@ class DelCommand(private val storage: KeyValueStorage) : Command {
 
     override fun command(): String = "DEL"
 
-    override fun handle(args: List<ByteArray>): Array<ByteArray> {
+    override fun handle(args: Array<ByteArray>): Array<ByteArray> {
         if (args.size != 2) throw IllegalArgumentException("[DEL] some arguments are missing")
 
         val key = args[1]

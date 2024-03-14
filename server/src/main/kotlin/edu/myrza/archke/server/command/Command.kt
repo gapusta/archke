@@ -4,6 +4,6 @@ interface Command {
 
     fun command(): String
 
-    fun handle(args: List<ByteArray>): Array<ByteArray>
+    fun handle(args: Array<ByteArray>): Array<ByteArray>
 
 }

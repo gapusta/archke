@@ -7,7 +7,7 @@ class GetCommand(private val storage: KeyValueStorage) : Command {
 
     override fun command(): String = "GET"
 
-    override fun handle(args: List<ByteArray>): Array<ByteArray> {
+    override fun handle(args: Array<ByteArray>): Array<ByteArray> {
         if (args.size != 2) throw IllegalArgumentException("[GET] some arguments are missing")
 
         val key = args[1]

@@ -4,7 +4,7 @@ import edu.myrza.archke.server.command.DelCommand
 import edu.myrza.archke.server.command.ExistCommand
 import edu.myrza.archke.server.command.GetCommand
 import edu.myrza.archke.server.command.SetCommand
-import edu.myrza.archke.server.controller.ControllerSupplierImpl
+import edu.myrza.archke.server.controller.ControllerImpl
 import edu.myrza.archke.server.io.Acceptor
 import edu.myrza.archke.server.io.Reactor
 import edu.myrza.archke.server.db.KeyValueStorageImpl
@@ -34,7 +34,7 @@ class Server(private val port: Int) {
             DelCommand(service),
             ExistCommand(service)
         )
-        val controllerSupplier = ControllerSupplierImpl(commands)
+        val controller = ControllerImpl(commands)
 
         // IO LAYER
         val selector = Selector.open()
@@ -50,7 +50,7 @@ class Server(private val port: Int) {
             return
         }
         val key = serverChannel.register(selector, SelectionKey.OP_ACCEPT)
-        val acceptor = Acceptor(serverChannel, selector, controllerSupplier)
+        val acceptor = Acceptor(serverChannel, selector, controller)
         key.attach(acceptor)
 
         reactor = Reactor(selector)

@@ -4,7 +4,6 @@ import edu.myrza.archke.server.controller.Controller
 import edu.myrza.archke.server.controller.parser.Reader
 import edu.myrza.archke.server.io.Handler.State.*
 import java.io.IOException
-import java.net.SocketException
 import java.nio.ByteBuffer
 import java.nio.channels.SelectionKey
 import java.nio.channels.SocketChannel
@@ -20,6 +19,8 @@ class Handler (
 
     private var inBuffer = ByteBuffer.wrap(backingArray)
     private var outBuffers = emptyArray<ByteBuffer>()
+
+    private var reader = Reader()
 
     override fun run() {
         try {
@@ -43,18 +44,17 @@ class Handler (
             return
         }
 
-        process()
+        reader.read(inBuffer.array(), inBuffer.position()).also { inBuffer.clear() }
+
+        if (reader.done()) process()
     }
 
     private fun process() {
-        val result = controller.handle(inBuffer.array(), inBuffer.position())
+        val result = controller.handle(reader.payload())
 
-        inBuffer.clear()
-
-        if (result == null) return
+        reader = Reader()
 
         outBuffers = result.map { ByteBuffer.wrap(it) }.toTypedArray()
-
         key.interestOps(SelectionKey.OP_WRITE)
         state = WRITE
     }

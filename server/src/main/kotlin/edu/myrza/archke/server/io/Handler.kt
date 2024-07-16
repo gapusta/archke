@@ -15,9 +15,8 @@ class Handler (
 ) : Runnable {
 
     private var state = READ
-    private var backingArray = ByteArray(BUFFER_SIZE)
 
-    private var inBuffer = ByteBuffer.wrap(backingArray)
+    private var inBuffer = ByteBuffer.wrap(ByteArray(BUFFER_SIZE))
     private var outBuffers = emptyArray<ByteBuffer>()
 
     private var reader = Reader()

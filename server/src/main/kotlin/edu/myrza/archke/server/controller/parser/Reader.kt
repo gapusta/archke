@@ -6,70 +6,83 @@ import java.nio.ByteBuffer
 class Reader {
 
     private var state = READ_ARRAY
-    private var arrayLength = 0
 
-    private var binary: ByteBuffer = ByteBuffer.allocate(0)
-    private var currentLength = 0
+    private var argl = 0
+    private var arg: ByteBuffer = EMPTY_ARG
 
-    private lateinit var array: ArrayList<ByteArray>
+    private var argc = 0
+    private var argv: ArrayList<ByteArray> = EMPTY_ARRAY
 
-    fun read(chunk: ByteArray, length: Int) {
-        for (idx in 0 until length) {
-            val current = chunk[idx]
+    fun state(): State = state
 
-            if (state == READ_ARRAY) {
-                if (current != ARRAY) throw IllegalStateException("* was expected")
-                state = READ_ARRAY_LENGTH
-                continue
-            }
+    fun payload(): Array<ByteArray> = argv.toTypedArray()
 
-            if (state == READ_BINARY) {
-                if (current != BINARY_STR) throw IllegalStateException("$ was expected")
-                state = READ_BINARY_LENGTH
-                continue
-            }
+    fun done(): Boolean = state() == DONE
 
-            if (state == READ_ARRAY_LENGTH || state == READ_BINARY_LENGTH) {
-                val number = current - 0x30 // 0x30 == '0' in ascii
+    fun read(chunk: ByteArray, occupied: Int) {
+        for (idx in 0 until occupied) {
+            val byte = chunk[idx]
 
-                if (number in 0..9) {
-                    currentLength = currentLength * 10 + number
+            when (state) {
+                READ_ARRAY -> {
+                    if (byte != ARRAY) throw IllegalStateException("* was expected")
+
+                    state = READ_ARRAY_LENGTH
                     continue
                 }
+                READ_ARRAY_LENGTH -> {
+                    val digit = byte - 0x30 // 0x30 == '0' in ascii
 
-                if (current == CR) continue
+                    if (digit in 0..9) {
+                        argc = argc * 10 + digit
+                        continue
+                    }
 
-                if (current == LF && state == READ_ARRAY_LENGTH) {
-                    arrayLength = currentLength
-                    array = ArrayList(arrayLength)
-                    currentLength = 0
-                    state = if (arrayLength == 0) DONE else READ_BINARY
+                    if (byte == CR) continue
+                    if (byte == LF) {
+                        argv = ArrayList(argc)
+                        state = if (argc == 0) DONE else READ_BINARY
+                    }
                 }
+                READ_BINARY -> {
+                    if (byte != BINARY_STR) throw IllegalStateException("$ was expected")
 
-                if (current == LF && state == READ_BINARY_LENGTH) {
-                    binary = ByteBuffer.wrap(ByteArray(currentLength))
-                    currentLength = 0
-                    state = READ_BINARY_DATA
+                    state = READ_BINARY_LENGTH
+                    continue
                 }
-            }
+                READ_BINARY_LENGTH -> {
+                    val digit = byte - 0x30 // 0x30 == '0' in ascii
 
-            if (state == READ_BINARY_DATA && binary.hasRemaining() && current != LF) {
-                binary.put(current)
-            }
+                    if (digit in 0..9) {
+                        argl = argl * 10 + digit
+                        continue
+                    }
 
-            if (state == READ_BINARY_DATA && !binary.hasRemaining()) {
-                array.add(binary.array())
-                arrayLength--
-                state = if (arrayLength == 0) DONE else READ_BINARY
+                    if (byte == CR) continue
+                    if (byte == LF) {
+                        if (argl == 0) {
+                            handle(EMPTY_ARG.array())
+                        } else {
+                            arg = ByteBuffer.wrap(ByteArray(argl))
+                            argl = 0
+                            state = READ_BINARY_DATA
+                        }
+                    }
+                }
+                READ_BINARY_DATA -> {
+                    if (arg.hasRemaining() && byte != LF) arg.put(byte)
+                    if (!arg.hasRemaining()) handle(arg.array())
+                }
+                DONE -> break
             }
         }
     }
 
-    fun state(): State = state
-
-    fun payload(): Array<ByteArray> = array.toTypedArray()
-
-    fun done(): Boolean = state() == DONE
+    private fun handle(arg: ByteArray) {
+        argv.add(arg)
+        argc--
+        state = if (argc == 0) DONE else READ_BINARY
+    }
 
     enum class State {
         READ_ARRAY,
@@ -77,8 +90,6 @@ class Reader {
         READ_BINARY,
         READ_BINARY_LENGTH,
         READ_BINARY_DATA,
-
-        READ_LF,
         DONE
     }
 
@@ -87,5 +98,8 @@ class Reader {
         private const val BINARY_STR = 0x24.toByte() // '$'
         private const val CR = 0x0d.toByte() // '\r'
         private const val LF = 0x0a.toByte() // '\n'
+
+        private val EMPTY_ARRAY = arrayListOf<ByteArray>()
+        private val EMPTY_ARG = ByteBuffer.allocate(0)
     }
 }

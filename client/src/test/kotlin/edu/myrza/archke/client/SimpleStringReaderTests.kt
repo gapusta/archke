@@ -1,32 +1,28 @@
 package edu.myrza.archke.client
 
+import edu.myrza.archke.client.reader.SimpleStringReader
 import org.junit.jupiter.api.Test
+import java.io.ByteArrayInputStream
 import kotlin.test.assertEquals
 
 class SimpleStringReaderTests {
 
     @Test
     fun readOkTest() {
-        val reader = SimpleStringReader()
-
         val ok = "+OK\r\n".toByteArray(Charsets.US_ASCII)
+        val reader = SimpleStringReader(ByteArrayInputStream(ok))
+        val result = reader.read()
 
-        reader.read(ok, ok.size)
-
-        assert(reader.done())
-        assertEquals("OK", reader.payload())
+        assertEquals("OK", result)
     }
 
     @Test
     fun readTest() {
-        val reader = SimpleStringReader()
-
         val ok = "+Catch me if you can, Mr. Holmes\r\n".toByteArray(Charsets.US_ASCII)
+        val reader = SimpleStringReader(ByteArrayInputStream(ok))
+        val result = reader.read()
 
-        reader.read(ok, ok.size)
-
-        assert(reader.done())
-        assertEquals("Catch me if you can, Mr. Holmes", reader.payload())
+        assertEquals("Catch me if you can, Mr. Holmes", result)
     }
 
 }

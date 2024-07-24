@@ -1,8 +1,12 @@
 package edu.myrza.archke.client
 
+import edu.myrza.archke.client.reader.BinaryStringReader
+import edu.myrza.archke.client.reader.BooleanReader
+import edu.myrza.archke.client.reader.IntegerReader
+import edu.myrza.archke.client.reader.SimpleStringReader
 import java.net.Socket
 
-class SessionImpl internal constructor(private val socket: Socket) : Session {
+class ClientImpl internal constructor(private val socket: Socket) : Client {
 
     private val inputStream = socket.getInputStream()
     private val outputStream = socket.getOutputStream()
@@ -19,15 +23,10 @@ class SessionImpl internal constructor(private val socket: Socket) : Session {
         outputStream.write(value)
         outputStream.flush()
 
-        val reader = SimpleStringReader()
-        val buffer = ByteArray(BUFFER_MAX_SIZE)
-        while (true) {
-            val read = inputStream.read(buffer)
-            reader.read(buffer, read)
-            if (reader.done()) break
-        }
+        val reader = SimpleStringReader(inputStream)
+        val response = reader.read()
 
-        return reader.payload()
+        return response
     }
 
     override fun get(key: ByteArray): ByteArray? {

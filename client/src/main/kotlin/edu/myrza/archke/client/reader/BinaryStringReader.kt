@@ -1,6 +1,6 @@
-package edu.myrza.archke.client
+package edu.myrza.archke.client.reader
 
-import edu.myrza.archke.client.BinaryStringReader.State.*
+import edu.myrza.archke.client.reader.BinaryStringReader.State.*
 import java.nio.ByteBuffer
 
 class BinaryStringReader {

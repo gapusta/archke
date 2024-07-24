@@ -1,6 +1,6 @@
 package edu.myrza.archke.example
 
-import edu.myrza.archke.client.Session
+import edu.myrza.archke.client.Client
 import java.util.regex.Pattern
 
 fun main(args: Array<String>) {
@@ -8,7 +8,7 @@ fun main(args: Array<String>) {
 
     val host = "localhost"
     val port = 9999
-    val session = Session.open(host, port)
+    val client = Client.connect(host, port)
 
     println("Session opened")
 
@@ -23,7 +23,7 @@ fun main(args: Array<String>) {
             val words = line.split(Pattern.compile("[ ]+"))
             val key = words[1].toByteArray(Charsets.US_ASCII)
             val value = words[2].toByteArray(Charsets.UTF_8)
-            val response = session.set(key, value)
+            val response = client.set(key, value)
 
             println(response)
             continue
@@ -32,7 +32,7 @@ fun main(args: Array<String>) {
         if (line.startsWith("GET", true)) {
             val words = line.split(Pattern.compile("[ ]+"))
             val key = words[1].toByteArray(Charsets.US_ASCII)
-            val value = session.get(key)?.let { String(it, Charsets.UTF_8) } ?: "(null)"
+            val value = client.get(key)?.let { String(it, Charsets.UTF_8) } ?: "(null)"
 
             println(value)
             continue
@@ -41,7 +41,7 @@ fun main(args: Array<String>) {
         if (line.startsWith("EXISTS", true)) {
             val words = line.split(Pattern.compile("[ ]+"))
             val key = words[1].toByteArray(Charsets.US_ASCII)
-            val value = session.exists(key)
+            val value = client.exists(key)
 
             println(value)
             continue
@@ -50,7 +50,7 @@ fun main(args: Array<String>) {
         if (line.startsWith("DEL", true)) {
             val words = line.split(Pattern.compile("[ ]+"))
             val key = words[1].toByteArray(Charsets.US_ASCII)
-            val value = session.delete(key)
+            val value = client.delete(key)
 
             println(value)
             continue
@@ -59,7 +59,7 @@ fun main(args: Array<String>) {
         println("Unknown command")
     }
 
-    session.close()
+    client.close()
 
     println("Session closed")
 }

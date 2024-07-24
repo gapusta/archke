@@ -3,7 +3,7 @@ package edu.myrza.archke.client
 import java.io.Closeable
 import java.net.Socket
 
-interface Session : Closeable {
+interface Client : Closeable {
 
     fun set(key: ByteArray, value: ByteArray): String
 
@@ -17,11 +17,11 @@ interface Session : Closeable {
 
     companion object {
 
-        fun open(host: String, port: Int): Session {
+        fun connect(host: String, port: Int): Client {
             val socket = Socket(host, port)
-//            socket.setSoLinger(true, 0) // Will trigger RST when closing the socket
+            // socket.setSoLinger(true, 0) // Will trigger RST when closing the socket
 
-            return SessionImpl(socket)
+            return ClientImpl(socket)
         }
 
     }

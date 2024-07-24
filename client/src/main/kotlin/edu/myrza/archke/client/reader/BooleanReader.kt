@@ -1,6 +1,6 @@
-package edu.myrza.archke.client
+package edu.myrza.archke.client.reader
 
-import edu.myrza.archke.client.BooleanReader.State.*
+import edu.myrza.archke.client.reader.BooleanReader.State.*
 
 class BooleanReader {
 

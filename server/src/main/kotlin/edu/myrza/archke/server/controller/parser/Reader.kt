@@ -7,7 +7,7 @@ class Reader {
 
     private var state = READ_ARRAY
 
-    private var argl = 0
+    private var argl = 0 // argument length
     private var arg: ByteBuffer = EMPTY_ARG
 
     private var argc = 0

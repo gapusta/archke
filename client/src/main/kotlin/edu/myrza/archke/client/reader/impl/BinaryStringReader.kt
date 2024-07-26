@@ -4,14 +4,14 @@ import edu.myrza.archke.client.reader.Reader
 import edu.myrza.archke.client.reader.impl.BinaryStringReader.State.*
 import java.nio.ByteBuffer
 
-class BinaryStringReader: Reader {
+class BinaryStringReader: Reader<ByteArray?> {
 
     private var state = START
 
     private var binary: ByteBuffer? = null
     private var length = 0
 
-    fun payload(): ByteArray? = binary?.array()
+    override fun payload(): ByteArray? = binary?.array()
 
     override fun done(): Boolean = state == DONE
 

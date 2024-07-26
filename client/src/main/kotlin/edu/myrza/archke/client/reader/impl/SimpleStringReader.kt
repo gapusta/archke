@@ -3,14 +3,14 @@ package edu.myrza.archke.client.reader.impl
 import edu.myrza.archke.client.reader.Reader
 import edu.myrza.archke.client.reader.impl.SimpleStringReader.State.*
 
-class SimpleStringReader: Reader {
+class SimpleStringReader: Reader<String> {
 
     private var state = READ
     private val builder = StringBuffer()
 
     override fun done() = state == DONE
 
-    fun payload() = builder.toString()
+    override fun payload() = builder.toString()
 
     override fun read(chunk: ByteArray, occupied: Int) {
         for (idx in 0 until occupied) {

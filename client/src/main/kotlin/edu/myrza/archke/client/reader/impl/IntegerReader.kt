@@ -3,12 +3,12 @@ package edu.myrza.archke.client.reader.impl
 import edu.myrza.archke.client.reader.Reader
 import edu.myrza.archke.client.reader.impl.IntegerReader.State.*
 
-class IntegerReader : Reader {
+class IntegerReader : Reader<Int> {
 
     private var state = READ_INTEGER
     private var value = 0
 
-    fun payload() = value
+    override fun payload() = value
 
     override fun done() = state == DONE
 

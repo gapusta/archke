@@ -3,14 +3,14 @@ package edu.myrza.archke.client.reader.impl
 import edu.myrza.archke.client.reader.Reader
 import edu.myrza.archke.client.reader.impl.BooleanReader.State.*
 
-class BooleanReader : Reader {
+class BooleanReader : Reader<Boolean> {
 
     private var state = READ
     private var payload = false
 
     fun state(): State = state
 
-    fun payload(): Boolean = payload
+    override fun payload(): Boolean = payload
 
     override fun done(): Boolean = state() == DONE
 

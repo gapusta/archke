@@ -1,6 +1,6 @@
 package edu.myrza.archke.client
 
-import edu.myrza.archke.client.reader.BooleanReader
+import edu.myrza.archke.client.reader.impl.BooleanReader
 import org.junit.jupiter.api.Test
 import kotlin.test.assertFalse
 

@@ -1,29 +1,19 @@
-package edu.myrza.archke.client.reader
+package edu.myrza.archke.client.reader.impl
 
-import edu.myrza.archke.client.reader.SimpleStringReader.State.*
-import java.io.InputStream
+import edu.myrza.archke.client.reader.Reader
+import edu.myrza.archke.client.reader.impl.SimpleStringReader.State.*
 
-class SimpleStringReader(private val input: InputStream) {
+class SimpleStringReader: Reader {
 
     private var state = READ
-
     private val builder = StringBuffer()
-    private val buffer = ByteArray(BUFFER_SIZE)
 
-    fun read(): String {
-        while (true) {
-            val read = input.read(buffer)
+    override fun done() = state == DONE
 
-            read(buffer, read)
+    fun payload() = builder.toString()
 
-            if (state == DONE) break
-        }
-
-        return builder.toString().also { builder.setLength(0) }
-    }
-
-    private fun read(chunk: ByteArray, length: Int) {
-        for (idx in 0 until length) {
+    override fun read(chunk: ByteArray, occupied: Int) {
+        for (idx in 0 until occupied) {
             val byte = chunk[idx]
 
             when (state) {
@@ -55,7 +45,6 @@ class SimpleStringReader(private val input: InputStream) {
         private const val SIMPLE_STR = 0x2b.toByte() // '+'
         private const val CR = 0x0d.toByte() // '\r'
         private const val LF = 0x0a.toByte() // '\n'
-
-        private const val BUFFER_SIZE = 8 * 1024 // 8kb
     }
+
 }

@@ -1,14 +1,21 @@
-package edu.myrza.archke.client.reader
+package edu.myrza.archke.client.reader.impl
 
-import edu.myrza.archke.client.reader.BooleanReader.State.*
+import edu.myrza.archke.client.reader.Reader
+import edu.myrza.archke.client.reader.impl.BooleanReader.State.*
 
-class BooleanReader {
+class BooleanReader : Reader {
 
     private var state = READ
     private var payload = false
 
-    fun read(chunk: ByteArray, length: Int) {
-        for (idx in 0 until length) {
+    fun state(): State = state
+
+    fun payload(): Boolean = payload
+
+    override fun done(): Boolean = state() == DONE
+
+    override fun read(chunk: ByteArray, occupied: Int) {
+        for (idx in 0 until occupied) {
             val current = chunk[idx]
 
             if (state == READ) {
@@ -20,22 +27,15 @@ class BooleanReader {
             if (state == READ_DATA) {
                 if (current == TRUE) payload = true
                 if (current == FALSE) payload = false
-                if (current == CR) { /*do nothing*/ }
+                if (current == CR) continue
                 if (current == LF) state = DONE
             }
         }
     }
 
-    fun state(): State = state
-
-    fun payload(): Boolean = payload
-
-    fun done(): Boolean = state() == DONE
-
     enum class State {
         READ,
         READ_DATA,
-
         DONE
     }
 
@@ -46,4 +46,5 @@ class BooleanReader {
         private const val CR = 0x0d.toByte() // '\r'
         private const val LF = 0x0a.toByte() // '\n'
     }
+
 }

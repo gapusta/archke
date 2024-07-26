@@ -1,6 +1,6 @@
 package edu.myrza.archke.client
 
-import edu.myrza.archke.client.reader.IntegerReader
+import edu.myrza.archke.client.reader.impl.IntegerReader
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 

@@ -132,4 +132,20 @@ class BinaryStringReaderTests {
         assertNull(reader.payload())
     }
 
+    @Test
+    fun readEmptyStringTest() {
+        val reader = BinaryStringReader()
+
+        val data = "$0\r\n".toByteArray(Charsets.US_ASCII)
+
+        reader.read(data, data.size)
+
+        assert(reader.done())
+
+        val payload = reader.payload()
+
+        assertNotNull(payload)
+        assertEquals(0, payload.size)
+    }
+
 }

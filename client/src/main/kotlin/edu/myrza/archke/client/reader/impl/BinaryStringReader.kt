@@ -38,7 +38,8 @@ class BinaryStringReader: Reader<ByteArray?> {
                     if (byte == CR) continue
                     if (byte == LF) {
                         binary = ByteBuffer.wrap(ByteArray(length))
-                        state = READ_BINARY_DATA
+
+                        state = if (length == 0) DONE else READ_BINARY_DATA
                     }
                 }
                 READ_BINARY_DATA -> {

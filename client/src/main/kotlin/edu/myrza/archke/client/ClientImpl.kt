@@ -18,36 +18,36 @@ class ClientImpl internal constructor(private val socket: Socket) : Client {
     override fun set(key: ByteArray, value: ByteArray): String {
         write(SET, key, value)
 
-        val reader = SimpleStringReader()
-
-        return read(reader)
+        return readSimpleString()
     }
 
     override fun get(key: ByteArray): ByteArray? {
         write(GET, key)
 
-        val reader = BinaryStringReader()
-
-        return read(reader)
+        return readBinaryString()
     }
 
     override fun delete(key: ByteArray): Int {
         write(DELETE, key)
 
-        val reader = IntegerReader()
-
-        return read(reader)
+        return readInteger()
     }
 
     override fun exists(key: ByteArray): Boolean {
         write(EXISTS, key)
 
-        val reader = BooleanReader()
-
-        return read(reader)
+        return readBoolean()
     }
 
-    private fun <T> read(reader: Reader<T>): T {
+    private fun readSimpleString() = readWith(SimpleStringReader())
+
+    private fun readBinaryString() = readWith(BinaryStringReader())
+
+    private fun readInteger() = readWith(IntegerReader())
+
+    private fun readBoolean() = readWith(BooleanReader())
+
+    private fun <T> readWith(reader: Reader<T>): T {
         while (!reader.done()) {
             val read = inputStream.read(buffer)
             reader.read(buffer, read)

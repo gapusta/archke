@@ -15,7 +15,7 @@ fun main(args: Array<String>) {
     while (true) {
         print("> ")
 
-        val line = readLine()!!.trim()
+        val line = readln().trim()
 
         if (line == "exit") break
 

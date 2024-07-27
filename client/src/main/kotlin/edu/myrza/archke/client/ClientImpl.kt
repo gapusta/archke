@@ -5,25 +5,18 @@ import edu.myrza.archke.client.reader.impl.BinaryStringReader
 import edu.myrza.archke.client.reader.impl.BooleanReader
 import edu.myrza.archke.client.reader.impl.IntegerReader
 import edu.myrza.archke.client.reader.impl.SimpleStringReader
+import java.io.BufferedOutputStream
 import java.net.Socket
 
 class ClientImpl internal constructor(private val socket: Socket) : Client {
 
     private val inputStream = socket.getInputStream()
-    private val outputStream = socket.getOutputStream()
     private val buffer = ByteArray(BUFFER_MAX_SIZE)
 
-    override fun set(key: ByteArray, value: ByteArray): String {
-        val header = "*3\r\n$3\r\nSET".toByteArray(Charsets.US_ASCII)
-        val keyHeader = "$${key.size}\r\n".toByteArray(Charsets.US_ASCII)
-        val valueHeader = "$${value.size}\r\n".toByteArray(Charsets.US_ASCII)
+    private val outputStream = BufferedOutputStream(socket.getOutputStream(), BUFFER_MAX_SIZE)
 
-        outputStream.write(header)
-        outputStream.write(keyHeader)
-        outputStream.write(key)
-        outputStream.write(valueHeader)
-        outputStream.write(value)
-        outputStream.flush()
+    override fun set(key: ByteArray, value: ByteArray): String {
+        write(SET, key, value)
 
         val reader = SimpleStringReader()
 
@@ -31,13 +24,7 @@ class ClientImpl internal constructor(private val socket: Socket) : Client {
     }
 
     override fun get(key: ByteArray): ByteArray? {
-        val header = "*2\r\n$3\r\nGET".toByteArray(Charsets.US_ASCII)
-        val keyHeader = "$${key.size}\r\n".toByteArray(Charsets.US_ASCII)
-
-        outputStream.write(header)
-        outputStream.write(keyHeader)
-        outputStream.write(key)
-        outputStream.flush()
+        write(GET, key)
 
         val reader = BinaryStringReader()
 
@@ -45,13 +32,7 @@ class ClientImpl internal constructor(private val socket: Socket) : Client {
     }
 
     override fun delete(key: ByteArray): Int {
-        val header = "*2\r\n$3\r\nDEL".toByteArray(Charsets.US_ASCII)
-        val keyHeader = "$${key.size}\r\n".toByteArray(Charsets.US_ASCII)
-
-        outputStream.write(header)
-        outputStream.write(keyHeader)
-        outputStream.write(key)
-        outputStream.flush()
+        write(DELETE, key)
 
         val reader = IntegerReader()
 
@@ -59,13 +40,7 @@ class ClientImpl internal constructor(private val socket: Socket) : Client {
     }
 
     override fun exists(key: ByteArray): Boolean {
-        val header = "*2\r\n$6\r\nEXISTS".toByteArray(Charsets.US_ASCII)
-        val keyHeader = "$${key.size}\r\n".toByteArray(Charsets.US_ASCII)
-
-        outputStream.write(header)
-        outputStream.write(keyHeader)
-        outputStream.write(key)
-        outputStream.flush()
+        write(EXISTS, key)
 
         val reader = BooleanReader()
 
@@ -81,12 +56,32 @@ class ClientImpl internal constructor(private val socket: Socket) : Client {
         return reader.payload()
     }
 
+    private fun write(vararg array: ByteArray) {
+        var header = "*${array.size}\r\n".toByteArray(Charsets.US_ASCII)
+
+        outputStream.write(header)
+
+        for (element in array) {
+            header = "$${element.size}\r\n".toByteArray(Charsets.US_ASCII)
+
+            outputStream.write(header)
+            outputStream.write(element)
+        }
+
+        outputStream.flush()
+    }
+
     override fun close() {
         socket.close()
     }
 
     companion object {
-        private const val BUFFER_MAX_SIZE = 1024
+        private val SET = "SET".toByteArray(Charsets.US_ASCII)
+        private val GET = "GET".toByteArray(Charsets.US_ASCII)
+        private val DELETE = "DELETE".toByteArray(Charsets.US_ASCII)
+        private val EXISTS = "EXISTS".toByteArray(Charsets.US_ASCII)
+
+        private const val BUFFER_MAX_SIZE = 2 * 1048576 // 2 mb
     }
 
 }

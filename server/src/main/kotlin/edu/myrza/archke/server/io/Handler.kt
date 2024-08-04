@@ -16,8 +16,8 @@ class Handler (
 
     private var state = READ
 
-    private var inBuffer = ByteBuffer.wrap(ByteArray(BUFFER_SIZE))
-    private var outBuffers = emptyArray<ByteBuffer>()
+    private var input = ByteBuffer.wrap(ByteArray(BUFFER_SIZE))
+    private var output = ArrayList<ByteBuffer>()
 
     private var reader = Reader()
 
@@ -36,16 +36,18 @@ class Handler (
     }
 
     private fun read() {
-        val read = channel.read(inBuffer)
+        val read = channel.read(input)
 
         if (read == -1) { // client signaled he will not send anything (FIN, ACK)
             cleanUp()
             return
         }
 
-        reader.read(inBuffer.array(), inBuffer.position()).also { inBuffer.clear() }
+        reader.read(input.array(), input.position())
 
         if (reader.done()) process()
+
+        input.clear()
     }
 
     private fun process() {
@@ -53,17 +55,17 @@ class Handler (
 
         reader = Reader()
 
-        outBuffers = result.map { ByteBuffer.wrap(it) }.toTypedArray()
+        result.map { ByteBuffer.wrap(it) }.apply { output.addAll(this) }
+
         key.interestOps(SelectionKey.OP_WRITE)
         state = WRITE
     }
 
     private fun write() {
-        channel.write(outBuffers)
+        channel.write(output.toTypedArray())
 
-        if (!outBuffers.last().hasRemaining()) {
-            // output payload is written completely
-            outBuffers = emptyArray()
+        if (!output.last().hasRemaining()) { // output payload is written completely
+            output.clear()
 
             // register reading event listening
             key.interestOps(SelectionKey.OP_READ)

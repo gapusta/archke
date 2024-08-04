@@ -28,7 +28,7 @@ class ClientImpl internal constructor(private val socket: Socket) : Client {
     }
 
     override fun delete(key: ByteArray): Int {
-        write(DELETE, key)
+        write(DEL, key)
 
         return readInteger()
     }
@@ -78,7 +78,7 @@ class ClientImpl internal constructor(private val socket: Socket) : Client {
     companion object {
         private val SET = "SET".toByteArray(Charsets.US_ASCII)
         private val GET = "GET".toByteArray(Charsets.US_ASCII)
-        private val DELETE = "DELETE".toByteArray(Charsets.US_ASCII)
+        private val DEL = "DEL".toByteArray(Charsets.US_ASCII)
         private val EXISTS = "EXISTS".toByteArray(Charsets.US_ASCII)
 
         private const val BUFFER_MAX_SIZE = 2 * 1048576 // 2 mb

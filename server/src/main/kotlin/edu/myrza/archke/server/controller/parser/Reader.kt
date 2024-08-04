@@ -19,8 +19,8 @@ class Reader {
 
     fun done(): Boolean = state() == DONE
 
-    fun read(chunk: ByteArray, occupied: Int) {
-        for (idx in 0 until occupied) {
+    fun read(chunk: ByteArray, start: Int, limit: Int): Int { // start - inclusive, limit - exclusive
+        for (idx in start until limit) {
             val byte = chunk[idx]
 
             when (state) {
@@ -73,9 +73,11 @@ class Reader {
                     if (arg.hasRemaining() && byte != LF) arg.put(byte)
                     if (!arg.hasRemaining()) handle(arg.array())
                 }
-                DONE -> break
+                DONE -> return idx
             }
         }
+
+        return start + limit - 1 // returns last processed byte's index
     }
 
     private fun handle(arg: ByteArray) {

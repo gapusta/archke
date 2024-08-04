@@ -43,7 +43,7 @@ class Handler (
             return
         }
 
-        reader.read(input.array(), input.position())
+        reader.read(input.array(), 0, input.position())
 
         if (reader.done()) process()
 

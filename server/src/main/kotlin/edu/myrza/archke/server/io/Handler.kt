@@ -37,15 +37,20 @@ class Handler (
 
     private fun read() {
         val read = channel.read(input)
+        var start = 0
 
         if (read == -1) { // client signaled he will not send anything (FIN, ACK)
             cleanUp()
             return
         }
 
-        reader.read(input.array(), 0, input.position())
+        while (true) {
+            start = reader.read(input.array(), start, input.position())
 
-        if (reader.done()) process()
+            if (!reader.done()) break // buffer does not contain the current command's full data
+
+            process()
+        }
 
         input.clear()
     }
@@ -62,6 +67,8 @@ class Handler (
     }
 
     private fun write() {
+        // TODO: find out if during next write, already written out buffer are skipped
+        //  because if they are not, then each write will write from start(from very first byte) again
         channel.write(output.toTypedArray())
 
         if (!output.last().hasRemaining()) { // output payload is written completely
@@ -87,4 +94,5 @@ class Handler (
     companion object {
         private const val BUFFER_SIZE = 128 * 1024 // 128 KB
     }
+
 }

@@ -77,7 +77,7 @@ class Reader {
             }
         }
 
-        return start + limit - 1 // returns last processed byte's index
+        return start + limit
     }
 
     private fun handle(arg: ByteArray) {

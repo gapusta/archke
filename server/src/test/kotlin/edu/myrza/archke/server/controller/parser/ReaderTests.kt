@@ -11,7 +11,7 @@ class ReaderTests {
 
         val singlePayload = "*3\r\n$3\r\nSET$5\r\nMYKEY$7\r\nMYVALUE".toByteArray(Charsets.US_ASCII)
 
-        reader.read(singlePayload, singlePayload.size)
+        reader.read(singlePayload, 0, singlePayload.size)
 
         assertEquals(reader.done(), true)
 
@@ -37,14 +37,14 @@ class ReaderTests {
         val chunk7 = "S".toByteArray(Charsets.UTF_8)
         val chunk8 = "ET".toByteArray(Charsets.UTF_8)
 
-        reader.read(chunk1, chunk1.size)
-        reader.read(chunk2, chunk2.size)
-        reader.read(chunk3, chunk3.size)
-        reader.read(chunk4, chunk4.size)
-        reader.read(chunk5, chunk5.size)
-        reader.read(chunk6, chunk6.size)
-        reader.read(chunk7, chunk7.size)
-        reader.read(chunk8, chunk8.size)
+        reader.read(chunk1, 0, chunk1.size)
+        reader.read(chunk2, 0, chunk2.size)
+        reader.read(chunk3, 0, chunk3.size)
+        reader.read(chunk4, 0, chunk4.size)
+        reader.read(chunk5, 0, chunk5.size)
+        reader.read(chunk6, 0, chunk6.size)
+        reader.read(chunk7, 0, chunk7.size)
+        reader.read(chunk8, 0, chunk8.size)
 
         assertEquals(reader.done(), true)
 
@@ -70,15 +70,15 @@ class ReaderTests {
         val chunk8 = "DIST".toByteArray(Charsets.UTF_8)
         val chunk9 = "INGUISH".toByteArray(Charsets.UTF_8)
 
-        reader.read(chunk1, chunk1.size)
-        reader.read(chunk2, chunk2.size)
-        reader.read(chunk3, chunk3.size)
-        reader.read(chunk4, chunk4.size)
-        reader.read(chunk5, chunk5.size)
-        reader.read(chunk6, chunk6.size)
-        reader.read(chunk7, chunk7.size)
-        reader.read(chunk8, chunk8.size)
-        reader.read(chunk9, chunk9.size)
+        reader.read(chunk1, 0, chunk1.size)
+        reader.read(chunk2, 0, chunk2.size)
+        reader.read(chunk3, 0, chunk3.size)
+        reader.read(chunk4, 0, chunk4.size)
+        reader.read(chunk5, 0, chunk5.size)
+        reader.read(chunk6, 0, chunk6.size)
+        reader.read(chunk7, 0, chunk7.size)
+        reader.read(chunk8, 0, chunk8.size)
+        reader.read(chunk9, 0, chunk9.size)
 
         assertEquals(reader.done(), true)
 
@@ -102,14 +102,14 @@ class ReaderTests {
         val chunk7 = "DIST".toByteArray(Charsets.UTF_8)
         val chunk8 = "INGUISH".toByteArray(Charsets.UTF_8)
 
-        reader.read(chunk1, chunk1.size)
-        reader.read(chunk2, chunk2.size)
-        reader.read(chunk3, chunk3.size)
-        reader.read(chunk4, chunk4.size)
-        reader.read(chunk5, chunk5.size)
-        reader.read(chunk6, chunk6.size)
-        reader.read(chunk7, chunk7.size)
-        reader.read(chunk8, chunk8.size)
+        reader.read(chunk1, 0, chunk1.size)
+        reader.read(chunk2, 0, chunk2.size)
+        reader.read(chunk3, 0, chunk3.size)
+        reader.read(chunk4, 0, chunk4.size)
+        reader.read(chunk5, 0, chunk5.size)
+        reader.read(chunk6, 0, chunk6.size)
+        reader.read(chunk7, 0, chunk7.size)
+        reader.read(chunk8, 0, chunk8.size)
 
         assertEquals(reader.done(), true)
 
@@ -125,7 +125,7 @@ class ReaderTests {
 
         val chunk = "*0\r\n".toByteArray(Charsets.US_ASCII)
 
-        reader.read(chunk, chunk.size)
+        reader.read(chunk, 0, chunk.size)
 
         assertEquals(true, reader.done())
         assertEquals(reader.payload().size, 0)
@@ -140,10 +140,10 @@ class ReaderTests {
         val chunk3 = "\r".toByteArray(Charsets.US_ASCII)
         val chunk4 = "\n".toByteArray(Charsets.US_ASCII)
 
-        reader.read(chunk1, chunk1.size)
-        reader.read(chunk2, chunk2.size)
-        reader.read(chunk3, chunk3.size)
-        reader.read(chunk4, chunk4.size)
+        reader.read(chunk1, 0, chunk1.size)
+        reader.read(chunk2, 0, chunk2.size)
+        reader.read(chunk3, 0, chunk3.size)
+        reader.read(chunk4, 0, chunk4.size)
 
         assertEquals(reader.done(), true)
         assertEquals(reader.payload().size, 0)
@@ -156,8 +156,8 @@ class ReaderTests {
         val chunk1 = "*0".toByteArray(Charsets.US_ASCII)
         val chunk2 = "\r\n".toByteArray(Charsets.US_ASCII)
 
-        reader.read(chunk1, chunk1.size)
-        reader.read(chunk2, chunk2.size)
+        reader.read(chunk1, 0, chunk1.size)
+        reader.read(chunk2, 0, chunk2.size)
 
         assertEquals(reader.done(), true)
         assertEquals(reader.payload().size, 0)
@@ -170,8 +170,8 @@ class ReaderTests {
         val chunk1 = "*0\r".toByteArray(Charsets.US_ASCII)
         val chunk2 = "\n".toByteArray(Charsets.US_ASCII)
 
-        reader.read(chunk1, chunk1.size)
-        reader.read(chunk2, chunk2.size)
+        reader.read(chunk1, 0, chunk1.size)
+        reader.read(chunk2, 0, chunk2.size)
 
         assertEquals(reader.done(), true)
         assertEquals(reader.payload().size, 0)
@@ -184,8 +184,8 @@ class ReaderTests {
         val chunk1 = "*".toByteArray(Charsets.US_ASCII)
         val chunk2 = "0\r\n".toByteArray(Charsets.US_ASCII)
 
-        reader.read(chunk1, chunk1.size)
-        reader.read(chunk2, chunk2.size)
+        reader.read(chunk1, 0, chunk1.size)
+        reader.read(chunk2, 0, chunk2.size)
 
         assertEquals(reader.done(), true)
         assertEquals(reader.payload().size, 0)
@@ -199,9 +199,9 @@ class ReaderTests {
         val chunk2 = "0".toByteArray(Charsets.US_ASCII)
         val chunk3 = "\r\n".toByteArray(Charsets.US_ASCII)
 
-        reader.read(chunk1, chunk1.size)
-        reader.read(chunk2, chunk2.size)
-        reader.read(chunk3, chunk3.size)
+        reader.read(chunk1, 0, chunk1.size)
+        reader.read(chunk2, 0, chunk2.size)
+        reader.read(chunk3, 0, chunk3.size)
 
         assertEquals(reader.done(), true)
         assertEquals(reader.payload().size, 0)
@@ -213,7 +213,7 @@ class ReaderTests {
 
         val chunk = "*1\r\n$0\r\n".toByteArray(Charsets.US_ASCII)
 
-        reader.read(chunk, chunk.size)
+        reader.read(chunk, 0, chunk.size)
 
         assertEquals(reader.done(), true)
         assertEquals(reader.payload().size, 1)
@@ -226,7 +226,7 @@ class ReaderTests {
 
         val chunk = "*3\r\n$0\r\n$3\r\nhey$0\r\n".toByteArray(Charsets.US_ASCII)
 
-        reader.read(chunk, chunk.size)
+        reader.read(chunk, 0, chunk.size)
 
         assertEquals(reader.done(), true)
         assertEquals(reader.payload().size, 3)

@@ -49,18 +49,18 @@ class Handler (
 
             if (!reader.done()) break // buffer does not contain the current command's full data
 
-            process()
+            process(reader.payload())
+
+            reader = Reader()
         }
 
         input.clear()
     }
 
-    private fun process() {
-        val result = controller.handle(reader.payload())
+    private fun process(request: Array<ByteArray>) {
+        val result = controller.handle(request).map { ByteBuffer.wrap(it) }
 
-        reader = Reader()
-
-        result.map { ByteBuffer.wrap(it) }.apply { output.addAll(this) }
+        output.addAll(result)
 
         key.interestOps(SelectionKey.OP_WRITE)
         state = WRITE

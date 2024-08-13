@@ -54,6 +54,12 @@ class Handler (
             reader = Reader()
         }
 
+        if (output.isNotEmpty()) {
+            // There are complete responses to commands ready to be sent back to the client
+            key.interestOps(SelectionKey.OP_WRITE)
+            state = WRITE
+        }
+
         input.clear()
     }
 
@@ -61,9 +67,6 @@ class Handler (
         val result = controller.handle(request).map { ByteBuffer.wrap(it) }
 
         output.addAll(result)
-
-        key.interestOps(SelectionKey.OP_WRITE)
-        state = WRITE
     }
 
     private fun write() {
@@ -74,7 +77,7 @@ class Handler (
         channel.write(output.toTypedArray())
 
         if (!output.last().hasRemaining()) {
-            // output payload is written completely, clean up
+            // all the responses have been successfully sent, clean up
             output.clear()
 
             // register reading event listening

@@ -9,7 +9,7 @@ import java.nio.channels.SelectionKey
 import java.nio.channels.SocketChannel
 
 class Handler (
-    private var key: SelectionKey,
+    private val key: SelectionKey,
     private val channel: SocketChannel,
     private val controller: Controller
 ) : Runnable {

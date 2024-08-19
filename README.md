@@ -19,3 +19,7 @@
 - https://github.com/PeterScott/netstring-c
 - https://docs.oracle.com/javase/8/docs/api/java/nio/channels/SelectableChannel.html
 - https://docs.gradle.org/current/userguide/toolchains.html
+
+- https://cs.baylor.edu/~donahoo/practical/CSockets/TCPRST.pdf
+- https://cs.baylor.edu/~donahoo/practical/CSockets/Endian.pdf
+- https://cs.baylor.edu/~donahoo/practical/JavaSockets/RecvQClose.pdf

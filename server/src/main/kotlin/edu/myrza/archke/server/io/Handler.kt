@@ -70,6 +70,7 @@ class Handler (
     }
 
     private fun write() {
+        // TODO: Exceptions when writing are not handled, fix it
         // Writes the content of the buffers in the order/sequence they are encountered in the array (from 0 up to output.length).
         // Only data between "position" and "limit" of any particular buffer is written. If n bytes
         // are written from a buffer, the buffer's position p changes to p+n-1. Empty buffers (buffers with position equal to limit)

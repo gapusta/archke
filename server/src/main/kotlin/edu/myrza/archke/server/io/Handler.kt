@@ -39,7 +39,7 @@ class Handler (
         val read = channel.read(input)
         var start = 0
 
-        if (read == -1) { // client signaled he will not send anything (FIN, ACK)
+        if (read == -1) { // client signaled he will not send anything, client sent (FIN, ACK)
             cleanUp()
             return
         }
@@ -89,7 +89,8 @@ class Handler (
 
     private fun cleanUp() {
         try {
-            channel.close() // will also implicitly cancel selection key
+            channel.shutdownOutput() // Here, we send [FIN, ACK] back
+            channel.close() // Here we release resources and implicitly cancel selection key
             println("Connection closed")
         } catch (ex: IOException) {
             println("Error during connection closing : ${ex.message}")

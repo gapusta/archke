@@ -1,0 +1,5 @@
+https://stackoverflow.com/questions/54937761/socket-close2-send-rst-packet-instead-of-fin-packet
+https://github.com/torvalds/linux/blob/master/net/ipv4/tcp.c#L2794 - __tcp_close() - Linux
+kernel source code tcp close implementation
+
+

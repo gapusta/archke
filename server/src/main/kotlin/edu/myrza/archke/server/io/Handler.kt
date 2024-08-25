@@ -27,11 +27,10 @@ class Handler (
                 READ -> read()
                 WRITE -> write()
             }
-        }
-        catch (ex: IOException) {
+        } catch (ex: IOException) {
             // one of the possible causes of SocketException is RST (client abruptly closed the connection)
             println("Connection error during [ $state ] event processing : ${ex.message}")
-            cleanUp()
+            closeConnection()
         }
     }
 
@@ -40,7 +39,7 @@ class Handler (
         var start = 0
 
         if (read == -1) { // client signaled he will not send anything, client sent (FIN, ACK)
-            cleanUp()
+            closeConnection()
             return
         }
 
@@ -70,7 +69,6 @@ class Handler (
     }
 
     private fun write() {
-        // TODO: Exceptions when writing are not handled, fix it
         // Writes the content of the buffers in the order/sequence they are encountered in the array (from 0 up to output.length).
         // Only data between "position" and "limit" of any particular buffer is written. If n bytes
         // are written from a buffer, the buffer's position p changes to p+n-1. Empty buffers (buffers with position equal to limit)
@@ -87,7 +85,7 @@ class Handler (
         }
     }
 
-    private fun cleanUp() {
+    private fun closeConnection() {
         try {
             channel.shutdownOutput() // Here, we send [FIN, ACK] back
             channel.close() // Here we release resources and implicitly cancel selection key

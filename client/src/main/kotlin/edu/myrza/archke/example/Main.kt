@@ -56,6 +56,12 @@ fun main(args: Array<String>) {
             continue
         }
 
+        if (line.startsWith("SHUTDOWN", true)) {
+            client.shutdown()
+            println("shutdown complete")
+            break
+        }
+
         println("Unknown command")
     }
 

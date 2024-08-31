@@ -39,6 +39,12 @@ class ClientImpl internal constructor(private val socket: Socket) : Client {
         return readBoolean()
     }
 
+    override fun shutdown() {
+        write(SHUTDOWN)
+
+        readEOF()
+    }
+
     private fun readSimpleString() = readWith(SimpleStringReader())
 
     private fun readBinaryString() = readWith(BinaryStringReader())
@@ -54,6 +60,13 @@ class ClientImpl internal constructor(private val socket: Socket) : Client {
         }
 
         return reader.payload()
+    }
+
+    private fun readEOF() {
+        var read = inputStream.read(buffer)
+        while (read > -1) {
+            read = inputStream.read(buffer)
+        }
     }
 
     private fun write(vararg array: ByteArray) {
@@ -80,6 +93,7 @@ class ClientImpl internal constructor(private val socket: Socket) : Client {
         private val GET = "GET".toByteArray(Charsets.US_ASCII)
         private val DEL = "DEL".toByteArray(Charsets.US_ASCII)
         private val EXISTS = "EXISTS".toByteArray(Charsets.US_ASCII)
+        private val SHUTDOWN = "SHUTDOWN".toByteArray(Charsets.US_ASCII)
 
         private const val BUFFER_MAX_SIZE = 2 * 1048576 // 2 mb
     }

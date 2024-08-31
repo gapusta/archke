@@ -1,8 +1,8 @@
 package edu.myrza.archke
 
-import edu.myrza.archke.server.Server
+import edu.myrza.archke.server.Archke
 
 fun main(args: Array<String>) {
-    val server = Server(9999)
-    server.start()
+    val archke = Archke(9999)
+    archke.start()
 }

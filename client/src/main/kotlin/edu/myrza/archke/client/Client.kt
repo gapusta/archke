@@ -13,6 +13,8 @@ interface Client : Closeable {
 
     fun exists(key: ByteArray): Boolean
 
+    fun shutdown()
+
     override fun close()
 
     companion object {

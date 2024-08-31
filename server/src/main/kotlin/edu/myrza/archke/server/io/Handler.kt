@@ -65,7 +65,8 @@ class Handler (
     private fun process(request: Array<ByteArray>) {
         val result = controller.handle(request).map { ByteBuffer.wrap(it) }
 
-        output.addAll(result)
+        // some commands might return nothing to client (e.g. "SHUTDOWN")
+        if (result.isNotEmpty()) output.addAll(result)
     }
 
     private fun write() {

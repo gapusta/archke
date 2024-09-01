@@ -1,7 +1,7 @@
 package edu.myrza.archke.server.io
 
 import edu.myrza.archke.server.Server
-import edu.myrza.archke.server.util.silentClose
+import java.io.Closeable
 
 class Reactor (private val server: Server) : Runnable {
 
@@ -35,5 +35,7 @@ class Reactor (private val server: Server) : Runnable {
             channel.use { it.shutdownOutput() }
         }
     }
+
+    private fun Closeable.silentClose() = try { this.close() } catch (_: Exception) { }
 
 }

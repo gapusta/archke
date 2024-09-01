@@ -62,12 +62,7 @@ class ClientImpl internal constructor(private val socket: Socket) : Client {
         return reader.payload()
     }
 
-    private fun readEOF() {
-        var read = inputStream.read(buffer)
-        while (read > -1) {
-            read = inputStream.read(buffer)
-        }
-    }
+
 
     private fun write(vararg array: ByteArray) {
         var header = "*${array.size}\r\n".toByteArray(Charsets.US_ASCII)
@@ -84,8 +79,16 @@ class ClientImpl internal constructor(private val socket: Socket) : Client {
         outputStream.flush()
     }
 
-    override fun close() {
-        socket.close()
+    override fun close() = socket.use {
+        socket.shutdownOutput()
+        readEOF()
+    }
+
+    private fun readEOF() {
+        var read = inputStream.read(buffer)
+        while (read > -1) {
+            read = inputStream.read(buffer)
+        }
     }
 
     companion object {

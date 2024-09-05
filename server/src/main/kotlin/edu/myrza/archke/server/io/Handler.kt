@@ -16,8 +16,8 @@ class Handler (
 
     private var state = READ
 
-    private var input = ByteBuffer.wrap(ByteArray(BUFFER_SIZE))
-    private var output = ArrayList<ByteBuffer>()
+    private val input = ByteBuffer.wrap(ByteArray(BUFFER_SIZE))
+    private val output = ArrayList<ByteBuffer>()
 
     private var reader = Reader()
 

@@ -2,6 +2,7 @@ package edu.myrza.archke.server.io
 
 import edu.myrza.archke.server.Server
 import java.io.Closeable
+import java.nio.channels.SocketChannel
 
 class Reactor (private val server: Server) : Runnable {
 
@@ -28,11 +29,12 @@ class Reactor (private val server: Server) : Runnable {
     }
 
     private fun stop() {
-        server.selector.silentClose()
         server.channel.silentClose()
-
-        for (channel in server.clientChannels) {
-            channel.use { it.shutdownOutput() }
+        server.selector.use {
+            val channels = server.selector.keys().mapNotNull { it.channel() as? SocketChannel }
+            for (channel in channels) {
+                channel.use { it.shutdownInput() }
+            }
         }
     }
 

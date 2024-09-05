@@ -19,7 +19,6 @@ class Acceptor (private val server: Server) : Runnable {
         val handler = Handler(key, channel, server.controller)
 
         key.attach(handler)
-        server.clientChannels.add(channel)
     }
 
 }

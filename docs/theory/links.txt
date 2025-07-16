@@ -1,0 +1,9 @@
+https://mail.openjdk.org/pipermail/nio-dev/2008-December/000329.html
+https://eklitzke.org/blocking-io-nonblocking-io-and-epoll
+https://javaagile.blogspot.com/2013/09/level-and-edge-triggered-io.html
+https://stackoverflow.com/questions/23465401/why-native-epoll-support-is-introduced-in-netty/
+https://stackoverflow.com/questions/62327122/java-selector-op-read-not-triggered-if-data-is-already-available
+https://stackoverflow.com/questions/26420947/what-are-the-underlying-differences-among-select-epoll-kqueue-and-evport
+https://stackoverflow.com/questions/40123626/kqueue-edge-triggered-does-a-short-read-mean-that-read-readiness-was-lost
+
+Post about Netty - https://www.alibabacloud.com/blog/598081

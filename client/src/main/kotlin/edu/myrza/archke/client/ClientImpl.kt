@@ -1,5 +1,6 @@
 package edu.myrza.archke.client
 
+import edu.myrza.archke.client.exception.ClientException
 import edu.myrza.archke.client.reader.*
 import edu.myrza.archke.client.reader.impl.BinaryStringReader
 import edu.myrza.archke.client.reader.impl.BooleanReader
@@ -56,6 +57,11 @@ class ClientImpl internal constructor(private val socket: Socket) : Client {
     private fun <T> readWith(reader: Reader<T>): T {
         while (!reader.done()) {
             val read = inputStream.read(buffer)
+            if (read == -1) {
+                // server stopper sending data back. Maybe the server was shutdown
+                socket.shutdownOutput()
+                throw ClientException.ConnectionClosed()
+            }
             reader.read(buffer, read)
         }
 

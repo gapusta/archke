@@ -26,7 +26,13 @@ fun main(args: Array<String>) {
                     val words = line.split(Pattern.compile("[ ]+"))
                     val key = words[1].toByteArray(Charsets.US_ASCII)
                     val value = words[2].toByteArray(Charsets.UTF_8)
-                    val response = client.set(key, value)
+
+                    val response = if (words.size > 4) {
+                        val timeout = words[4].toInt()
+                        client.set(key, value, timeout)
+                    } else {
+                        client.set(key, value)
+                    }
 
                     println(response)
                     continue

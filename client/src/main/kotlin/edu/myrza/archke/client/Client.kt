@@ -7,6 +7,8 @@ interface Client : Closeable {
 
     fun set(key: ByteArray, value: ByteArray): String
 
+    fun set(key: ByteArray, value: ByteArray, timeout: Int): String
+
     fun get(key: ByteArray): ByteArray?
 
     fun delete(key: ByteArray): Int

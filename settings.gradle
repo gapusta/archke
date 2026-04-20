@@ -1,3 +1,2 @@
 rootProject.name = 'archke'
-include 'server'
 include 'client'
